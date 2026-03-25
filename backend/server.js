@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
 
 // Load env variables
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.json());
 // app.use('/api/borrowing', borrowingRoutes); // Member 2
 // app.use('/api/analytics', analyticsRoutes); // Member 3
 // app.use('/api/admin', adminRoutes);         // Member 4
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
   res.send('UNI NEST API is running...');
