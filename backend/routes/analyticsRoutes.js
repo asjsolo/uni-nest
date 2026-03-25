@@ -7,12 +7,20 @@ import {
   getAllItems,
   getAllUsers,
 } from '../controllers/reviewController.js';
+import {
+  getStudentSummary,
+  getRentalHistory,
+} from '../controllers/analyticsController.js';
 
 const router = express.Router();
 
 // Users & Items
 router.get('/users', getAllUsers);
 router.get('/items', getAllItems);
+
+// Student Analytics
+router.get('/summary/:userId', getStudentSummary);
+router.get('/rentals/:userId', getRentalHistory);
 
 // Reviews CRUD
 router.post('/reviews', createReview);

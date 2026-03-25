@@ -6,6 +6,11 @@ const API = axios.create({ baseURL: '/api/analytics' });
 export const getAllUsers = () => API.get('/users');
 export const getAllItems = () => API.get('/items');
 
+// Student Analytics
+export const getStudentSummary = (userId) => API.get(`/summary/${userId}`);
+export const getRentalHistory = (userId, params = {}) =>
+  API.get(`/rentals/${userId}`, { params });
+
 // Reviews CRUD
 export const createReview = (data) => API.post('/reviews', data);
 export const getReviewsByItem = (itemId) => API.get(`/reviews/item/${itemId}`);
