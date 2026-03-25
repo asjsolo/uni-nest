@@ -10,6 +10,7 @@ import {
 import {
   getStudentSummary,
   getRentalHistory,
+  getTrustScore,
 } from '../controllers/analyticsController.js';
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.get('/items', getAllItems);
 // Student Analytics
 router.get('/summary/:userId', getStudentSummary);
 router.get('/rentals/:userId', getRentalHistory);
+router.get('/trust/:userId', getTrustScore);
 
 // Reviews CRUD
 router.post('/reviews', createReview);

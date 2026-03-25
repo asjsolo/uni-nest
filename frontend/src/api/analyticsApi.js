@@ -10,6 +10,7 @@ export const getAllItems = () => API.get('/items');
 export const getStudentSummary = (userId) => API.get(`/summary/${userId}`);
 export const getRentalHistory = (userId, params = {}) =>
   API.get(`/rentals/${userId}`, { params });
+export const getTrustScore = (userId) => API.get(`/trust/${userId}`);
 
 // Reviews CRUD
 export const createReview = (data) => API.post('/reviews', data);

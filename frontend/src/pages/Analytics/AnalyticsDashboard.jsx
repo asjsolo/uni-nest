@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import {
   getAllItems, getAllUsers, getReviewsByItem,
-  getStudentSummary, getRentalHistory,
+  getStudentSummary, getRentalHistory, getTrustScore,
 } from '../../api/analyticsApi';
 import StarRating from '../../components/StarRating';
 import ReviewForm from '../../components/ReviewForm';
 import ReviewList from '../../components/ReviewList';
+import TrustScore from '../../components/TrustScore';
 import './AnalyticsDashboard.css';
 
 const AnalyticsDashboard = () => {
@@ -17,6 +18,7 @@ const AnalyticsDashboard = () => {
 
   // Analytics state
   const [summary, setSummary] = useState(null);
+  const [trustData, setTrustData] = useState(null);
   const [rentals, setRentals] = useState([]);
   const [rentalFilter, setRentalFilter] = useState({ status: '', role: '' });
 
@@ -50,8 +52,10 @@ const AnalyticsDashboard = () => {
     if (currentUser) {
       fetchSummary();
       fetchRentals();
+      fetchTrustScore();
     } else {
       setSummary(null);
+      setTrustData(null);
       setRentals([]);
     }
   }, [currentUser]);
@@ -67,6 +71,15 @@ const AnalyticsDashboard = () => {
       setSummary(res.data);
     } catch (err) {
       console.error('Failed to load summary:', err);
+    }
+  };
+
+  const fetchTrustScore = async () => {
+    try {
+      const res = await getTrustScore(currentUser);
+      setTrustData(res.data);
+    } catch (err) {
+      console.error('Failed to load trust score:', err);
     }
   };
 
@@ -227,6 +240,9 @@ const AnalyticsDashboard = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Trust Score */}
+                <TrustScore trustData={trustData} />
 
                 {/* Rental History */}
                 <div className="rental-history-section">

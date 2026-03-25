@@ -915,6 +915,212 @@
   color: #6b7280;
 }
 
+/* ===== Trust Score Card ===== */
+.trust-score-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.trust-score-card h2 {
+  margin: 0 0 20px;
+  font-size: 1.3rem;
+}
+
+/* Circular Meter */
+.trust-meter {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 16px;
+}
+
+.trust-circle {
+  width: 100%;
+  height: 100%;
+}
+
+.trust-meter-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.trust-score-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.trust-score-label {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* Reliability Badge */
+.reliability-badge {
+  text-align: center;
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: inline-block;
+  margin: 0 auto 20px;
+  width: fit-content;
+}
+
+.trust-score-card > .reliability-badge {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reliability-high {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.reliability-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.reliability-low {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Score Breakdown Bars */
+.trust-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.breakdown-label {
+  font-size: 0.82rem;
+  color: #6b7280;
+  width: 100px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.breakdown-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.breakdown-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.breakdown-value {
+  font-size: 0.8rem;
+  color: #374151;
+  font-weight: 600;
+  width: 50px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Trust Stats */
+.trust-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 20px;
+}
+
+.trust-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.trust-stat-val {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.trust-stat-label {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  text-align: center;
+}
+
+/* Badges */
+.trust-badges h3 {
+  font-size: 1rem;
+  margin: 0 0 12px;
+  color: #374151;
+}
+
+.badges-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trust-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #f3f4f6;
+}
+
+.trust-badge-icon {
+  font-size: 1.4rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.trust-badge-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.trust-badge-info strong {
+  font-size: 0.85rem;
+  color: #1a1a2e;
+}
+
+.trust-badge-info span {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .dashboard-header {

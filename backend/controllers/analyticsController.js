@@ -1,4 +1,6 @@
 import Rental from '../models/Rental.js';
+import Review from '../models/Review.js';
+import Item from '../models/Item.js';
 import User from '../models/User.js';
 
 // @desc    Get student analytics summary (savings, earnings, rental counts)
@@ -89,6 +91,97 @@ export const getRentalHistory = async (req, res) => {
     });
 
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get trust score for a user (based on reviews received on their items + rental activity)
+// @route   GET /api/analytics/trust/:userId
+export const getTrustScore = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // --- Rating component (60% weight) ---
+    // Get all items owned by this user, then get reviews on those items
+    const ownedItems = await Item.find({ owner: userId }).select('_id');
+    const ownedItemIds = ownedItems.map((i) => i._id);
+
+    const ratingAgg = await Review.aggregate([
+      { $match: { item: { $in: ownedItemIds } } },
+      { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+    ]);
+
+    const avgRating = ratingAgg.length > 0 ? ratingAgg[0].avg : 0;
+    const reviewCount = ratingAgg.length > 0 ? ratingAgg[0].count : 0;
+
+    // Also count reviews this user has written (shows engagement)
+    const reviewsWritten = await Review.countDocuments({ reviewer: userId });
+
+    // --- Activity component (40% weight) ---
+    const completedAsBorrower = await Rental.countDocuments({ borrower: userId, status: 'completed' });
+    const completedAsLender = await Rental.countDocuments({ lender: userId, status: 'completed' });
+    const totalCompleted = completedAsBorrower + completedAsLender;
+
+    // --- Trust Score Calculation (0–100) ---
+    // Rating: (avgRating / 5) * 60, max 60 points
+    const ratingScore = reviewCount > 0 ? (avgRating / 5) * 60 : 0;
+
+    // Activity: min(totalCompleted / 10, 1) * 40, max 40 points
+    // 10 completed rentals = full activity score
+    const activityScore = Math.min(totalCompleted / 10, 1) * 40;
+
+    const trustScore = Math.round(ratingScore + activityScore);
+
+    // --- Reliability Level ---
+    let reliabilityLevel;
+    if (trustScore >= 80) reliabilityLevel = 'High';
+    else if (trustScore >= 50) reliabilityLevel = 'Medium';
+    else reliabilityLevel = 'Low';
+
+    // --- Badges ---
+    const badges = [];
+
+    if (completedAsLender >= 3) {
+      badges.push({ name: 'Trusted Lender', icon: 'shield', description: 'Completed 3+ rentals as lender' });
+    }
+    if (completedAsBorrower >= 3) {
+      badges.push({ name: 'Verified Renter', icon: 'check', description: 'Completed 3+ rentals as borrower' });
+    }
+    if (avgRating >= 4.5 && reviewCount >= 2) {
+      badges.push({ name: 'Top Rated', icon: 'star', description: 'Average rating 4.5+ with 2+ reviews' });
+    }
+    if (totalCompleted >= 5) {
+      badges.push({ name: 'Active Member', icon: 'zap', description: '5+ total completed rentals' });
+    }
+    if (reviewsWritten >= 3) {
+      badges.push({ name: 'Helpful Reviewer', icon: 'message', description: 'Written 3+ reviews' });
+    }
+    if (totalCompleted < 2) {
+      badges.push({ name: 'New Member', icon: 'wave', description: 'Just getting started' });
+    }
+
+    res.json({
+      user: { _id: user._id, name: user.name, email: user.email },
+      trustScore,
+      reliabilityLevel,
+      breakdown: {
+        ratingScore: Math.round(ratingScore),
+        activityScore: Math.round(activityScore),
+        avgRating: Math.round(avgRating * 10) / 10,
+        reviewCount,
+        reviewsWritten,
+        completedAsLender,
+        completedAsBorrower,
+        totalCompleted,
+      },
+      badges,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
