@@ -1,8 +1,14 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import inventoryRoutes from './routes/inventoryLenderRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load env variables
 dotenv.config();
@@ -16,12 +22,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/inventory', inventoryRoutes);
+
 // Routes Placeholders
-// app.use('/api/inventory', inventoryRoutes); // Member 1
 // app.use('/api/borrowing', borrowingRoutes); // Member 2
 // app.use('/api/analytics', analyticsRoutes); // Member 3
 // app.use('/api/admin', adminRoutes);         // Member 4
-app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
   res.send('UNI NEST API is running...');
