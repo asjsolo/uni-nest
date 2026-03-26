@@ -1,7 +1,10 @@
 import express from 'express';
+import { getAllUsers, getAllItems, deleteItem } from '../controllers/adminController.js';
+
 const router = express.Router();
 
-// Member 4 - Admin Management Routes
-// e.g., router.get('/users', getAllUsers);
+router.route('/users').get(getAllUsers);
+router.route('/items').get(getAllItems);
+router.route('/items/:id').delete(deleteItem);
 
 export default router;

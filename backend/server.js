@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Load env variables
 dotenv.config();
@@ -22,7 +23,8 @@ app.use('/api/analytics', analyticsRoutes); // Member 3
 // Routes Placeholders
 // app.use('/api/inventory', inventoryRoutes); // Member 1
 // app.use('/api/borrowing', borrowingRoutes); // Member 2
-// app.use('/api/admin', adminRoutes);         // Member 4
+// app.use('/api/analytics', analyticsRoutes); // Member 3
+app.use('/api/admin', adminRoutes);         // Member 4
 
 app.get('/', (req, res) => {
   res.send('UNI NEST API is running...');
