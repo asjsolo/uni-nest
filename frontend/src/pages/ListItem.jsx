@@ -86,6 +86,14 @@ const ListItem = () => {
   // ─── Handlers ─────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Prevent discount percentage from exceeding range
+    if (name === 'discountPercentage' && value !== '') {
+      const numValue = Number(value);
+      if (numValue > 100) return;
+      if (numValue < 0) return;
+    }
+    
     setForm((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
@@ -125,6 +133,30 @@ const ListItem = () => {
     setImagePreview(null);
     setImageError('');
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Check if form is valid and can be submitted
+  const isFormValid = () => {
+    return (
+      form.name.trim() &&
+      form.category &&
+      form.description.trim() &&
+      form.description.trim().length >= 10 &&
+      form.pricePerDay &&
+      Number(form.pricePerDay) > 0 &&
+      (form.discountPercentage === '' || (Number(form.discountPercentage) >= 0 && Number(form.discountPercentage) <= 100)) &&
+      form.quantity &&
+      Number.isInteger(Number(form.quantity)) &&
+      Number(form.quantity) >= 1 &&
+      form.minRentalDays &&
+      Number.isInteger(Number(form.minRentalDays)) &&
+      Number(form.minRentalDays) >= 1 &&
+      form.maxRentalDays &&
+      Number.isInteger(Number(form.maxRentalDays)) &&
+      Number(form.maxRentalDays) >= 1 &&
+      Number(form.maxRentalDays) >= Number(form.minRentalDays) &&
+      form.pickupLocation.trim()
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -289,9 +321,9 @@ const ListItem = () => {
                     placeholder="Describe your item — condition, brand, features…"
                     value={form.description}
                     onChange={handleChange}
-                    maxLength={1000}
+                    maxLength={200}
                   />
-                  <span className="field-hint">{form.description.length}/1000 characters</span>
+                  <span className="field-hint">{form.description.length}/200 characters</span>
                   {errors.description && <span className="field-error">⚠ {errors.description}</span>}
                 </div>
               </div>
@@ -476,7 +508,7 @@ const ListItem = () => {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn-submit-item" disabled={submitting}>
+                <button type="submit" className="btn-submit-item" disabled={submitting || !isFormValid()}>
                   {submitting ? (
                     <>
                       <span className="spin" /> Listing Item…
