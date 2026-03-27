@@ -11,9 +11,9 @@ const AdminDashboard = () => {
   ];
 
   const initialItems = [
-    { _id: 'i1', title: 'Textbook 1', category: 'Books', status: 'Available', pricing: { depositAmount: 10, fullPrice: 50 } },
-    { _id: 'i2', title: 'Lab Goggles', category: 'Equipment', status: 'Rented', pricing: { depositAmount: 5, fullPrice: 20 } },
-    { _id: 'i3', title: 'Scientific Calculator', category: 'Electronics', status: 'Available', pricing: { depositAmount: 15, fullPrice: 80 } },
+    { _id: 'i1', name: 'Textbook 1', category: 'Books', status: 'Available', rentalPrice: 10, marketPrice: 50 },
+    { _id: 'i2', name: 'Lab Goggles', category: 'Equipment', status: 'Rented', rentalPrice: 5, marketPrice: 20 },
+    { _id: 'i3', name: 'Scientific Calculator', category: 'Electronics', status: 'Available', rentalPrice: 15, marketPrice: 80 },
   ];
 
   const [users, setUsers] = useState(initialUsers);
@@ -33,6 +33,7 @@ const AdminDashboard = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching admin data, using dummy variables:', err);
+      setError(err.response?.data?.message || 'Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -157,13 +158,13 @@ const AdminDashboard = () => {
                       whileHover={{ scale: 1.01, backgroundColor: 'rgba(255,255,255,1)', boxShadow: '0 5px 15px -3px rgba(0,0,0,0.1)' }}
                       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                     >
-                      <td style={styles.td}><strong>{item.title}</strong></td>
+                      <td style={styles.td}><strong>{item.name}</strong></td>
                       <td style={styles.td}>{item.category}</td>
                       <td style={styles.td}>
                         <span style={getStatusBadge(item.status)}>{item.status}</span>
                       </td>
                       <td style={styles.td}>
-                        <span style={{color: colors.blue}}>${item.pricing?.depositAmount}</span> / ${item.pricing?.fullPrice}
+                        <span style={{color: colors.blue}}>${item.rentalPrice}</span> / ${item.marketPrice}
                       </td>
                       <td style={styles.td}>
                         <motion.button 

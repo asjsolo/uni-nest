@@ -36,7 +36,7 @@ export const createReview = async (req, res) => {
     }
 
     // Prevent owner from reviewing their own item
-    if (itemDoc.owner.toString() === reviewer) {
+    if (itemDoc.lender.toString() === reviewer) {
       return res.status(400).json({ message: 'You cannot review your own item' });
     }
 
@@ -176,7 +176,7 @@ export const deleteReview = async (req, res) => {
 // @route   GET /api/analytics/items
 export const getAllItems = async (req, res) => {
   try {
-    const items = await Item.find().populate('owner', 'name email');
+    const items = await Item.find().populate('lender', 'name email');
 
     // Attach average rating to each item
     const itemsWithRating = await Promise.all(

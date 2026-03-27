@@ -21,11 +21,11 @@ const seedData = async () => {
 
     // ===== USERS =====
     const users = await User.insertMany([
-      { name: 'Alice Santos', email: 'alice@university.edu' },
-      { name: 'Bob Reyes', email: 'bob@university.edu' },
-      { name: 'Charlie Cruz', email: 'charlie@university.edu' },
-      { name: 'Diana Lopez', email: 'diana@university.edu' },
-      { name: 'Ethan Garcia', email: 'ethan@university.edu' },
+      { name: 'Alice Santos', email: 'alice@university.edu', password: 'password123' },
+      { name: 'Bob Reyes', email: 'bob@university.edu', password: 'password123' },
+      { name: 'Charlie Cruz', email: 'charlie@university.edu', password: 'password123' },
+      { name: 'Diana Lopez', email: 'diana@university.edu', password: 'password123' },
+      { name: 'Ethan Garcia', email: 'ethan@university.edu', password: 'password123' },
     ]);
     console.log(`Created ${users.length} users`);
 
@@ -39,7 +39,7 @@ const seedData = async () => {
         category: 'Electronics',
         marketPrice: 120,
         rentalPrice: 15,
-        owner: alice._id,
+        lender: alice._id,
         image: 'https://placehold.co/300x200/4f46e5/white?text=Calculator',
       },
       {
@@ -48,7 +48,7 @@ const seedData = async () => {
         category: 'Books',
         marketPrice: 85,
         rentalPrice: 10,
-        owner: bob._id,
+        lender: bob._id,
         image: 'https://placehold.co/300x200/059669/white?text=Textbook',
       },
       {
@@ -57,7 +57,7 @@ const seedData = async () => {
         category: 'Sports',
         marketPrice: 45,
         rentalPrice: 5,
-        owner: charlie._id,
+        lender: charlie._id,
         image: 'https://placehold.co/300x200/d97706/white?text=Racket',
       },
       {
@@ -66,7 +66,7 @@ const seedData = async () => {
         category: 'Electronics',
         marketPrice: 60,
         rentalPrice: 8,
-        owner: alice._id,
+        lender: alice._id,
         image: 'https://placehold.co/300x200/dc2626/white?text=Arduino',
       },
       {
@@ -75,7 +75,7 @@ const seedData = async () => {
         category: 'Clothing',
         marketPrice: 30,
         rentalPrice: 3,
-        owner: diana._id,
+        lender: diana._id,
         image: 'https://placehold.co/300x200/7c3aed/white?text=Lab+Coat',
       },
       {
@@ -84,7 +84,7 @@ const seedData = async () => {
         category: 'Tools',
         marketPrice: 90,
         rentalPrice: 12,
-        owner: ethan._id,
+        lender: ethan._id,
         image: 'https://placehold.co/300x200/0891b2/white?text=Drill',
       },
     ]);

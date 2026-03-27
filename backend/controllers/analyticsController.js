@@ -109,7 +109,7 @@ export const getTrustScore = async (req, res) => {
 
     // --- Rating component (60% weight) ---
     // Get all items owned by this user, then get reviews on those items
-    const ownedItems = await Item.find({ owner: userId }).select('_id');
+    const ownedItems = await Item.find({ lender: userId }).select('_id');
     const ownedItemIds = ownedItems.map((i) => i._id);
 
     const ratingAgg = await Review.aggregate([

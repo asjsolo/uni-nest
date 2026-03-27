@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const itemSchema = new mongoose.Schema(
     {
-        title: {
+        name: {
             type: String,
             required: true,
         },
@@ -14,15 +14,16 @@ const itemSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        pricing: {
-            depositAmount: {
-                type: Number,
-                required: true,
-            },
-            fullPrice: {
-                type: Number,
-                required: true,
-            },
+        rentalPrice: {
+            type: Number,
+            required: true,
+        },
+        marketPrice: {
+            type: Number,
+            required: true,
+        },
+        image: {
+            type: String,
         },
         status: {
             type: String,

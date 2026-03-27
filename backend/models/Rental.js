@@ -2,12 +2,18 @@ import mongoose from 'mongoose';
 
 const rentalSchema = new mongoose.Schema(
     {
+        rentalId: {
+            type: String,
+        },
         item: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Item',
             required: true,
         },
-        buyer: {
+        itemName: {
+            type: String,
+        },
+        borrower: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
@@ -17,33 +23,32 @@ const rentalSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        dates: {
-            startDate: {
-                type: Date,
-                required: true,
-            },
-            endDate: {
-                type: Date,
-                required: true,
-            },
-            returnDate: {
-                type: Date,
-            },
+        rentalPrice: {
+            type: Number,
         },
-        paymentStatus: {
-            depositPaid: {
-                type: Boolean,
-                default: false,
-            },
-            fullAmountPaid: {
-                type: Boolean,
-                default: false,
-            },
+        marketPrice: {
+            type: Number,
         },
-        rentalStatus: {
+        durationDays: {
+            type: Number,
+        },
+        totalCost: {
+            type: Number,
+        },
+        status: {
             type: String,
-            enum: ['Pending', 'Approved', 'Active', 'Returned', 'Disputed'],
-            default: 'Pending',
+            enum: ['pending', 'approved', 'active', 'completed', 'ongoing', 'cancelled', 'disputed'],
+            default: 'pending',
+        },
+        startDate: {
+            type: Date,
+            required: true,
+        },
+        endDate: {
+            type: Date,
+        },
+        returnDate: {
+            type: Date,
         },
     },
     {
