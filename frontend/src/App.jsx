@@ -7,6 +7,8 @@ import Register from './pages/Register';
 import LenderDashboard from './pages/LenderDashboard';
 import BorrowerDashboard from './pages/BorrowerDashboard';
 import ListItem from './pages/ListItem';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 
 const PrivateRoute = ({ children, allowedRole }) => {
   const { user, loading } = useContext(AuthContext);
@@ -22,6 +24,13 @@ const PrivateRoute = ({ children, allowedRole }) => {
     return <Navigate to="/" replace />;
   }
 
+  return children;
+};
+
+// Guard for admin-only routes (uses separate localStorage token)
+const AdminPrivateRoute = ({ children }) => {
+  const token = localStorage.getItem('adminToken');
+  if (!token) return <Navigate to="/admin" replace />;
   return children;
 };
 
@@ -58,6 +67,17 @@ function App() {
               <PrivateRoute allowedRole="borrower">
                 <BorrowerDashboard />
               </PrivateRoute>
+            }
+          />
+
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <AdminPrivateRoute>
+                <AdminDashboard />
+              </AdminPrivateRoute>
             }
           />
         </Routes>
