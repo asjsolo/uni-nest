@@ -1,9 +1,16 @@
+/* ===== Brand Colors =====
+   Navy:     #281C59
+   Blue:     #4E8D9C
+   Mint:     #85C79A
+   Pale Sea: #EDF7BD
+============================= */
+
 /* ===== Dashboard Layout ===== */
 .dashboard {
   min-height: 100vh;
-  background: #f5f5f5;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color: #1a1a2e;
+  background: #281C59;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #281C59;
 }
 
 .dashboard-loading {
@@ -12,7 +19,8 @@
   justify-content: center;
   min-height: 100vh;
   font-size: 1.2rem;
-  color: #666;
+  color: #EDF7BD;
+  background: #281C59;
 }
 
 /* ===== Header ===== */
@@ -21,23 +29,25 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 32px;
-  background: #1a1a2e;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: rgba(40, 28, 89, 0.95);
+  color: #EDF7BD;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 2px solid rgba(78, 141, 156, 0.3);
 }
 
 .header-left h1 {
   margin: 0;
   font-size: 1.5rem;
   letter-spacing: 1px;
+  color: #4E8D9C;
 }
 
 .header-subtitle {
   font-size: 0.8rem;
-  color: #a5b4fc;
+  color: #85C79A;
   margin-left: 12px;
 }
 
@@ -49,22 +59,22 @@
 
 .header-right label {
   font-size: 0.85rem;
-  color: #a5b4fc;
+  color: #85C79A;
 }
 
 .header-right select {
   padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background: #16213e;
-  color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(78, 141, 156, 0.4);
+  background: rgba(40, 28, 89, 0.8);
+  color: #EDF7BD;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
 .current-user-badge {
-  background: #4f46e5;
-  color: #fff;
+  background: #4E8D9C;
+  color: #EDF7BD;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -82,7 +92,7 @@
 .items-section h2 {
   margin: 0 0 16px;
   font-size: 1.3rem;
-  color: #1a1a2e;
+  color: #EDF7BD;
 }
 
 .items-section.collapsed {
@@ -97,10 +107,10 @@
 
 /* ===== Item Card ===== */
 .item-card {
-  background: #fff;
-  border-radius: 12px;
+  background: #EDF7BD;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   border: 2px solid transparent;
@@ -108,18 +118,19 @@
 
 .item-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  border-color: #4E8D9C;
 }
 
 .item-card.active {
-  border-color: #4f46e5;
+  border-color: #4E8D9C;
 }
 
 .item-image {
   position: relative;
   height: 160px;
   overflow: hidden;
-  background: #e5e7eb;
+  background: rgba(40, 28, 89, 0.1);
 }
 
 .item-image img {
@@ -132,8 +143,8 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(26, 26, 46, 0.8);
-  color: #fff;
+  background: rgba(40, 28, 89, 0.85);
+  color: #EDF7BD;
   padding: 2px 10px;
   border-radius: 12px;
   font-size: 0.7rem;
@@ -148,6 +159,7 @@
 .item-info h3 {
   margin: 0 0 6px;
   font-size: 1rem;
+  color: #281C59;
 }
 
 .item-price {
@@ -159,13 +171,13 @@
 
 .rental-price {
   font-weight: 700;
-  color: #059669;
+  color: #4E8D9C;
   font-size: 0.95rem;
 }
 
 .market-price {
   font-size: 0.8rem;
-  color: #999;
+  color: #888;
   text-decoration: line-through;
 }
 
@@ -178,13 +190,13 @@
 
 .rating-text {
   font-size: 0.8rem;
-  color: #666;
+  color: #555;
 }
 
 .item-owner {
   margin: 8px 0 0;
   font-size: 0.8rem;
-  color: #888;
+  color: #666;
 }
 
 /* ===== Badges ===== */
@@ -196,13 +208,13 @@
 }
 
 .badge-high {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(133, 199, 154, 0.3);
+  color: #1a6b38;
 }
 
 .badge-medium {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(78, 141, 156, 0.2);
+  color: #3a6f7a;
 }
 
 .badge-low {
@@ -211,8 +223,8 @@
 }
 
 .badge-none {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: rgba(40, 28, 89, 0.1);
+  color: #666;
 }
 
 /* ===== Detail Section ===== */
@@ -227,8 +239,8 @@
 
 .btn-back {
   background: none;
-  border: 1px solid #d1d5db;
-  color: #374151;
+  border: 1px solid rgba(237, 247, 189, 0.4);
+  color: #EDF7BD;
   padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -238,17 +250,17 @@
 }
 
 .btn-back:hover {
-  background: #f3f4f6;
+  background: rgba(237, 247, 189, 0.1);
 }
 
 /* ===== Detail Header ===== */
 .detail-header {
   display: flex;
   gap: 24px;
-  background: #fff;
-  border-radius: 12px;
+  background: #EDF7BD;
+  border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
 }
 
@@ -256,12 +268,13 @@
   width: 260px;
   height: 180px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 12px;
   flex-shrink: 0;
 }
 
 .detail-info h2 {
   margin: 0 0 4px;
+  color: #281C59;
 }
 
 .detail-info .item-category {
@@ -271,7 +284,7 @@
 }
 
 .detail-desc {
-  color: #555;
+  color: #444;
   font-size: 0.9rem;
   margin: 0 0 12px;
   line-height: 1.5;
@@ -285,8 +298,8 @@
 }
 
 .savings-tag {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(133, 199, 154, 0.3);
+  color: #1a6b38;
   padding: 2px 10px;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -295,7 +308,7 @@
 
 .detail-owner {
   font-size: 0.85rem;
-  color: #666;
+  color: #555;
   margin: 0;
 }
 
@@ -304,10 +317,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #fff;
+  background: #EDF7BD;
   padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
 }
 
@@ -319,17 +332,17 @@
 .rating-number {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #281C59;
 }
 
 .rating-outof {
   font-size: 1rem;
-  color: #999;
+  color: #888;
 }
 
 .rating-count {
   font-size: 0.85rem;
-  color: #666;
+  color: #555;
 }
 
 /* ===== Review Form ===== */
@@ -338,31 +351,33 @@
 }
 
 .btn-write-review {
-  background: #4f46e5;
-  color: #fff;
+  background: #4E8D9C;
+  color: #EDF7BD;
   border: none;
   padding: 10px 24px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
+  box-shadow: 0 4px 12px rgba(78, 141, 156, 0.4);
 }
 
 .btn-write-review:hover {
-  background: #4338ca;
+  background: #3d7a88;
 }
 
 .review-form {
-  background: #fff;
+  background: #EDF7BD;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .review-form h3 {
   margin: 0 0 16px;
   font-size: 1.1rem;
+  color: #281C59;
 }
 
 .form-group {
@@ -373,7 +388,7 @@
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #374151;
+  color: #281C59;
   margin-bottom: 4px;
 }
 
@@ -381,20 +396,21 @@
 .form-group textarea {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 2px solid rgba(40, 28, 89, 0.15);
+  border-radius: 10px;
   font-size: 0.9rem;
   font-family: inherit;
-  background: #f9fafb;
+  background: rgba(255, 255, 255, 0.6);
   box-sizing: border-box;
   transition: border-color 0.2s;
+  color: #281C59;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: #4E8D9C;
+  box-shadow: 0 0 0 3px rgba(78, 141, 156, 0.2);
 }
 
 .rental-id-row {
@@ -407,8 +423,8 @@
 }
 
 .btn-generate {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: rgba(78, 141, 156, 0.15);
+  color: #4E8D9C;
   border: none;
   padding: 8px 14px;
   border-radius: 8px;
@@ -419,7 +435,7 @@
 }
 
 .btn-generate:hover {
-  background: #c7d2fe;
+  background: rgba(78, 141, 156, 0.25);
 }
 
 .form-error {
@@ -428,7 +444,7 @@
   margin: 0 0 8px;
   background: #fef2f2;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .form-actions {
@@ -437,18 +453,19 @@
 }
 
 .btn-submit {
-  background: #4f46e5;
-  color: #fff;
+  background: #4E8D9C;
+  color: #EDF7BD;
   border: none;
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(78, 141, 156, 0.3);
 }
 
 .btn-submit:hover {
-  background: #4338ca;
+  background: #3d7a88;
 }
 
 .btn-submit:disabled {
@@ -457,21 +474,21 @@
 }
 
 .btn-cancel {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: rgba(40, 28, 89, 0.08);
+  color: #281C59;
+  border: 1px solid rgba(40, 28, 89, 0.15);
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
 .btn-cancel:hover {
-  background: #e5e7eb;
+  background: rgba(40, 28, 89, 0.15);
 }
 
 .login-hint {
-  color: #6b7280;
+  color: #85C79A;
   font-size: 0.9rem;
   font-style: italic;
   margin-bottom: 16px;
@@ -485,15 +502,16 @@
 .reviews-section h3 {
   margin: 0 0 14px;
   font-size: 1.1rem;
+  color: #EDF7BD;
 }
 
 .no-reviews {
-  color: #9ca3af;
+  color: rgba(237, 247, 189, 0.6);
   font-style: italic;
   padding: 20px;
   text-align: center;
-  background: #fff;
-  border-radius: 12px;
+  background: rgba(237, 247, 189, 0.08);
+  border-radius: 16px;
 }
 
 .review-list {
@@ -503,10 +521,10 @@
 }
 
 .review-card {
-  background: #fff;
+  background: #EDF7BD;
   padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .review-header {
@@ -526,8 +544,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #4f46e5;
-  color: #fff;
+  background: #4E8D9C;
+  color: #EDF7BD;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -538,16 +556,17 @@
 .reviewer-info strong {
   display: block;
   font-size: 0.9rem;
+  color: #281C59;
 }
 
 .review-date {
   display: block;
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #888;
 }
 
 .review-comment {
-  color: #374151;
+  color: #333;
   font-size: 0.9rem;
   line-height: 1.5;
   margin: 0 0 10px;
@@ -561,8 +580,8 @@
 
 .rental-tag {
   font-size: 0.75rem;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: #555;
+  background: rgba(40, 28, 89, 0.08);
   padding: 2px 8px;
   border-radius: 6px;
 }
@@ -573,8 +592,8 @@
 }
 
 .btn-edit {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: rgba(78, 141, 156, 0.15);
+  color: #4E8D9C;
   border: none;
   padding: 4px 12px;
   border-radius: 6px;
@@ -584,7 +603,7 @@
 }
 
 .btn-edit:hover {
-  background: #c7d2fe;
+  background: rgba(78, 141, 156, 0.3);
 }
 
 .btn-delete {
@@ -605,9 +624,10 @@
 /* ===== Tab Bar ===== */
 .tab-bar {
   display: flex;
-  background: #fff;
-  border-bottom: 2px solid #e5e7eb;
+  background: rgba(40, 28, 89, 0.6);
+  border-bottom: 2px solid rgba(78, 141, 156, 0.3);
   padding: 0 32px;
+  backdrop-filter: blur(8px);
 }
 
 .tab-btn {
@@ -615,7 +635,7 @@
   background: none;
   border: none;
   border-bottom: 3px solid transparent;
-  color: #6b7280;
+  color: rgba(237, 247, 189, 0.6);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -624,24 +644,24 @@
 }
 
 .tab-btn:hover {
-  color: #4f46e5;
-  background: #f5f3ff;
+  color: #EDF7BD;
+  background: rgba(78, 141, 156, 0.1);
 }
 
 .tab-btn.active {
-  color: #4f46e5;
-  border-bottom-color: #4f46e5;
+  color: #EDF7BD;
+  border-bottom-color: #4E8D9C;
 }
 
 /* ===== Empty State ===== */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #6b7280;
+  color: rgba(237, 247, 189, 0.6);
 }
 
 .empty-state h2 {
-  color: #374151;
+  color: #EDF7BD;
   margin-bottom: 8px;
 }
 
@@ -649,6 +669,7 @@
 .summary-section h2 {
   margin: 0 0 16px;
   font-size: 1.3rem;
+  color: #EDF7BD;
 }
 
 .summary-cards {
@@ -662,16 +683,16 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: #fff;
+  background: #EDF7BD;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   border-left: 4px solid transparent;
 }
 
-.card-savings { border-left-color: #059669; }
+.card-savings { border-left-color: #85C79A; }
 .card-spent { border-left-color: #dc2626; }
-.card-earnings { border-left-color: #4f46e5; }
+.card-earnings { border-left-color: #4E8D9C; }
 .card-ongoing { border-left-color: #d97706; }
 
 .card-icon {
@@ -686,9 +707,9 @@
   flex-shrink: 0;
 }
 
-.card-savings .card-icon { background: #d1fae5; color: #059669; }
+.card-savings .card-icon { background: rgba(133, 199, 154, 0.3); color: #1a6b38; }
 .card-spent .card-icon { background: #fee2e2; color: #dc2626; }
-.card-earnings .card-icon { background: #e0e7ff; color: #4f46e5; }
+.card-earnings .card-icon { background: rgba(78, 141, 156, 0.2); color: #4E8D9C; }
 .card-ongoing .card-icon { background: #fef3c7; color: #d97706; }
 
 .card-content {
@@ -698,7 +719,7 @@
 
 .card-label {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #666;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -707,13 +728,13 @@
 .card-value {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #281C59;
   line-height: 1.2;
 }
 
 .card-sub {
   font-size: 0.78rem;
-  color: #9ca3af;
+  color: #888;
   margin-top: 2px;
 }
 
@@ -723,10 +744,10 @@
   align-items: center;
   justify-content: center;
   gap: 32px;
-  background: #fff;
+  background: #EDF7BD;
   padding: 16px 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   margin-bottom: 24px;
 }
 
@@ -739,19 +760,19 @@
 .stat-number {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #281C59;
 }
 
 .stat-label {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #666;
   font-weight: 500;
 }
 
 .stat-divider {
   width: 1px;
   height: 40px;
-  background: #e5e7eb;
+  background: rgba(40, 28, 89, 0.15);
 }
 
 /* ===== Rental History Section ===== */
@@ -771,6 +792,7 @@
 .history-header h2 {
   margin: 0;
   font-size: 1.3rem;
+  color: #EDF7BD;
 }
 
 .history-filters {
@@ -780,34 +802,35 @@
 
 .history-filters select {
   padding: 6px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid rgba(78, 141, 156, 0.4);
   border-radius: 8px;
   font-size: 0.85rem;
-  background: #fff;
-  color: #374151;
+  background: rgba(40, 28, 89, 0.8);
+  color: #EDF7BD;
   cursor: pointer;
 }
 
 .history-filters select:focus {
   outline: none;
-  border-color: #4f46e5;
+  border-color: #4E8D9C;
 }
 
 .empty-rentals {
   text-align: center;
-  color: #9ca3af;
+  color: rgba(237, 247, 189, 0.6);
   padding: 40px;
-  background: #fff;
-  border-radius: 12px;
+  background: rgba(237, 247, 189, 0.05);
+  border-radius: 16px;
   font-style: italic;
 }
 
 /* ===== Rental Table ===== */
 .rental-table-wrapper {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  background: #EDF7BD;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   overflow-x: auto;
+  border: 2px solid #4E8D9C;
 }
 
 .rental-table {
@@ -817,33 +840,32 @@
 }
 
 .rental-table th {
-  background: #f9fafb;
+  background: #4E8D9C;
   padding: 12px 16px;
   text-align: left;
   font-weight: 600;
-  color: #374151;
+  color: #EDF7BD;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 2px solid #e5e7eb;
   white-space: nowrap;
 }
 
 .rental-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #f3f4f6;
-  color: #374151;
+  border-bottom: 1px solid rgba(40, 28, 89, 0.08);
+  color: #281C59;
   vertical-align: middle;
 }
 
 .rental-table tbody tr:hover {
-  background: #f9fafb;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .rental-id-cell {
   font-family: monospace;
   font-size: 0.82rem;
-  color: #6b7280;
+  color: #666;
 }
 
 .rental-item-cell {
@@ -867,13 +889,13 @@
 }
 
 .role-borrower {
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(78, 141, 156, 0.2);
+  color: #3d7a88;
 }
 
 .role-lender {
-  background: #e0e7ff;
-  color: #4338ca;
+  background: rgba(133, 199, 154, 0.3);
+  color: #1a6b38;
 }
 
 .cost-cell {
@@ -883,7 +905,7 @@
 
 .saved-inline {
   font-size: 0.72rem;
-  color: #059669;
+  color: #85C79A;
   font-weight: 600;
 }
 
@@ -895,13 +917,13 @@
 }
 
 .status-completed {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(133, 199, 154, 0.3);
+  color: #1a6b38;
 }
 
 .status-ongoing {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(78, 141, 156, 0.2);
+  color: #3d7a88;
 }
 
 .status-cancelled {
@@ -912,21 +934,22 @@
 .date-cell {
   white-space: nowrap;
   font-size: 0.82rem;
-  color: #6b7280;
+  color: #666;
 }
 
 /* ===== Trust Score Card ===== */
 .trust-score-card {
-  background: #fff;
-  border-radius: 12px;
+  background: #EDF7BD;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   margin-bottom: 24px;
 }
 
 .trust-score-card h2 {
   margin: 0 0 20px;
   font-size: 1.3rem;
+  color: #281C59;
 }
 
 /* Circular Meter */
@@ -954,11 +977,12 @@
   font-size: 2.2rem;
   font-weight: 800;
   line-height: 1;
+  color: #281C59;
 }
 
 .trust-score-label {
   font-size: 0.9rem;
-  color: #9ca3af;
+  color: #888;
   font-weight: 500;
 }
 
@@ -981,13 +1005,13 @@
 }
 
 .reliability-high {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(133, 199, 154, 0.3);
+  color: #1a6b38;
 }
 
 .reliability-medium {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(78, 141, 156, 0.2);
+  color: #3d7a88;
 }
 
 .reliability-low {
@@ -1011,7 +1035,7 @@
 
 .breakdown-label {
   font-size: 0.82rem;
-  color: #6b7280;
+  color: #555;
   width: 100px;
   flex-shrink: 0;
   font-weight: 500;
@@ -1020,7 +1044,7 @@
 .breakdown-bar-bg {
   flex: 1;
   height: 8px;
-  background: #e5e7eb;
+  background: rgba(40, 28, 89, 0.1);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -1033,7 +1057,7 @@
 
 .breakdown-value {
   font-size: 0.8rem;
-  color: #374151;
+  color: #281C59;
   font-weight: 600;
   width: 50px;
   text-align: right;
@@ -1046,8 +1070,8 @@
   justify-content: space-around;
   gap: 12px;
   padding: 16px 0;
-  border-top: 1px solid #f3f4f6;
-  border-bottom: 1px solid #f3f4f6;
+  border-top: 1px solid rgba(40, 28, 89, 0.1);
+  border-bottom: 1px solid rgba(40, 28, 89, 0.1);
   margin-bottom: 20px;
 }
 
@@ -1061,12 +1085,12 @@
 .trust-stat-val {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: #281C59;
 }
 
 .trust-stat-label {
   font-size: 0.72rem;
-  color: #9ca3af;
+  color: #888;
   text-align: center;
 }
 
@@ -1074,7 +1098,7 @@
 .trust-badges h3 {
   font-size: 1rem;
   margin: 0 0 12px;
-  color: #374151;
+  color: #281C59;
 }
 
 .badges-grid {
@@ -1088,9 +1112,9 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  background: #f9fafb;
-  border-radius: 10px;
-  border: 1px solid #f3f4f6;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  border: 1px solid rgba(40, 28, 89, 0.08);
 }
 
 .trust-badge-icon {
@@ -1113,12 +1137,12 @@
 
 .trust-badge-info strong {
   font-size: 0.85rem;
-  color: #1a1a2e;
+  color: #281C59;
 }
 
 .trust-badge-info span {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #888;
 }
 
 /* ===== Responsive ===== */
