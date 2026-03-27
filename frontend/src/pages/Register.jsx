@@ -20,14 +20,89 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({
+    fullname: false,
+    email: false,
+    phonenumber: false,
+    campusRegistrationNumber: false,
+    password: false,
+  });
+
+  const validateEmail = (email) => {
+    const emailRegex = /^(IT|EN|BM|BT)\d{8}@/i;
+    return emailRegex.test(email);
+  };
+
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  };
+
+  const validateStudentId = (id) => {
+    const idRegex = /^(IT|EN|BM|BT)\d{8}$/i;
+    return idRegex.test(id);
+  };
+
+  const validateFullName = (name) => {
+    return name.trim().length > 0;
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6;
+  };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Only allow numbers for phone number
+    if (name === 'phonenumber') {
+      if (!/^\d*$/.test(value)) {
+        return;
+      }
+    }
+
+    setFormData({ ...formData, [name]: value });
+
+    // Real-time validation
+    let isValid = true;
+    if (name === 'fullname') {
+      isValid = validateFullName(value);
+    } else if (name === 'email') {
+      isValid = validateEmail(value);
+    } else if (name === 'phonenumber') {
+      isValid = validatePhoneNumber(value);
+    } else if (name === 'campusRegistrationNumber') {
+      isValid = validateStudentId(value);
+    } else if (name === 'password') {
+      isValid = validatePassword(value);
+    }
+
+    setValidationErrors({
+      ...validationErrors,
+      [name]: !isValid && value.length > 0,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Final validation check
+    const newValidationErrors = {
+      fullname: !validateFullName(formData.fullname),
+      email: !validateEmail(formData.email),
+      phonenumber: !validatePhoneNumber(formData.phonenumber),
+      campusRegistrationNumber: !validateStudentId(formData.campusRegistrationNumber),
+      password: !validatePassword(formData.password),
+    };
+
+    setValidationErrors(newValidationErrors);
+
+    if (Object.values(newValidationErrors).some(err => err)) {
+      setError('Please fix all validation errors before submitting.');
+      return;
+    }
+
     setLoading(true);
     try {
       const user = await register({ ...formData, role: selectedRole });
@@ -99,8 +174,10 @@ const Register = () => {
                     id="fullname"
                     type="text"
                     name="fullname"
-                    className="form-input"
-                    placeholder="John Doe"
+                    className={`form-input ${
+                      formData.fullname ? (validationErrors.fullname ? 'input-invalid' : 'input-valid') : ''
+                    }`}
+                    placeholder="Enter your full name"
                     value={formData.fullname}
                     onChange={handleChange}
                     required
@@ -112,10 +189,13 @@ const Register = () => {
                     id="phonenumber"
                     type="text"
                     name="phonenumber"
-                    className="form-input"
-                    placeholder="+92 300 0000000"
+                    className={`form-input ${
+                      formData.phonenumber ? (validationErrors.phonenumber ? 'input-invalid' : 'input-valid') : ''
+                    }`}
+                    placeholder="077 4444 333"
                     value={formData.phonenumber}
                     onChange={handleChange}
+                    maxLength="10"
                     required
                   />
                 </div>
@@ -127,13 +207,18 @@ const Register = () => {
                   id="email"
                   type="email"
                   name="email"
-                  className="form-input"
-                  placeholder="you@campus.edu"
+                  className={`form-input ${
+                    formData.email ? (validationErrors.email ? 'input-invalid' : 'input-valid') : ''
+                  }`}
+                  placeholder="Enter your university email"
                   value={formData.email}
                   onChange={handleChange}
                   required
                   autoComplete="email"
                 />
+                <small style={{ color: '#666', display: 'block', marginTop: '4px' }}>
+                  (e.g., IT12345678@sliit.com)
+                </small>
               </div>
 
               <div className="form-group">
@@ -142,12 +227,17 @@ const Register = () => {
                   id="campusRegistrationNumber"
                   type="text"
                   name="campusRegistrationNumber"
-                  className="form-input"
-                  placeholder="e.g. BSCS-2022-001"
+                  className={`form-input ${
+                    formData.campusRegistrationNumber ? (validationErrors.campusRegistrationNumber ? 'input-invalid' : 'input-valid') : ''
+                  }`}
+                  placeholder="Enter your Student ID"
                   value={formData.campusRegistrationNumber}
                   onChange={handleChange}
                   required
                 />
+                <small style={{ color: '#666', display: 'block', marginTop: '4px' }}>
+                  (e.g., IT12345678)
+                </small>
               </div>
 
               <div className="form-group">
@@ -156,7 +246,9 @@ const Register = () => {
                   id="password"
                   type="password"
                   name="password"
-                  className="form-input"
+                  className={`form-input ${
+                    formData.password ? (validationErrors.password ? 'input-invalid' : 'input-valid') : ''
+                  }`}
                   placeholder="Minimum 6 characters"
                   value={formData.password}
                   onChange={handleChange}
