@@ -367,7 +367,7 @@ const AnalyticsDashboard = () => {
                             </span>
                             <span className={`badge ${badge.className}`}>{badge.label}</span>
                           </div>
-                          <p className="item-owner">Owner: {item.owner?.name}</p>
+                          <p className="item-owner">Lender: {item.lender?.name}</p>
                         </div>
                       </div>
                     );
@@ -398,7 +398,7 @@ const AnalyticsDashboard = () => {
                       <span className="market-price">Market: Rs.{selectedItem.marketPrice}</span>
                       <span className="savings-tag">Save Rs.{selectedItem.marketPrice - selectedItem.rentalPrice}</span>
                     </div>
-                    <p className="detail-owner">Listed by: <strong>{selectedItem.owner?.name}</strong></p>
+                    <p className="detail-owner">Listed by: <strong>{selectedItem.lender?.name}</strong></p>
                   </div>
                 </div>
 
@@ -415,7 +415,7 @@ const AnalyticsDashboard = () => {
                   })()}
                 </div>
 
-                {currentUser && currentUser !== selectedItem.owner?._id && (
+                {currentUser && currentUser !== selectedItem.lender?._id && (
                   <div className="review-form-section">
                     {!showForm ? (
                       <button className="btn-write-review" onClick={() => setShowForm(true)}>
