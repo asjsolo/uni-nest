@@ -6,10 +6,10 @@ import Item from '../models/Item.js';
 // @route   POST /api/analytics/reviews
 export const createReview = async (req, res) => {
   try {
-    const { reviewer, item, rentalId, rating, comment } = req.body;
+    const { reviewer, item, rating, comment } = req.body;
 
     // Validate required fields
-    if (!reviewer || !item || !rentalId || !rating || !comment) {
+    if (!reviewer || !item || !rating || !comment) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -41,15 +41,14 @@ export const createReview = async (req, res) => {
     }
 
     // Check for duplicate review (same user + same rental)
-    const existingReview = await Review.findOne({ reviewer, rentalId });
+    const existingReview = await Review.findOne({ reviewer, item });
     if (existingReview) {
-      return res.status(409).json({ message: 'You already reviewed this rental' });
+      return res.status(409).json({ message: 'You already reviewed this item' });
     }
 
     const review = await Review.create({
       reviewer,
       item,
-      rentalId,
       rating,
       comment: comment.trim(),
     });

@@ -13,7 +13,6 @@ const reviewSchema = new mongoose.Schema({
   },
   rentalId: {
     type: String,
-    required: [true, 'Rental ID is required'],
   },
   rating: {
     type: Number,
@@ -31,8 +30,8 @@ const reviewSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// One review per user per rental
-reviewSchema.index({ reviewer: 1, rentalId: 1 }, { unique: true });
+// One review per user per item
+reviewSchema.index({ reviewer: 1, item: 1 }, { unique: true });
 
 const Review = mongoose.model('Review', reviewSchema);
 

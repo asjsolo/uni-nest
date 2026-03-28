@@ -5,13 +5,8 @@ import { createReview, updateReview } from '../api/analyticsApi';
 const ReviewForm = ({ itemId, currentUser, onReviewAdded, editingReview = null, onCancelEdit }) => {
   const [rating, setRating] = useState(editingReview ? editingReview.rating : 0);
   const [comment, setComment] = useState(editingReview ? editingReview.comment : '');
-  const [rentalId, setRentalId] = useState(editingReview ? editingReview.rentalId : '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const generateRentalId = () => {
-    setRentalId(`RENTAL-${Date.now().toString(36).toUpperCase()}`);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,10 +24,6 @@ const ReviewForm = ({ itemId, currentUser, onReviewAdded, editingReview = null, 
       setError('Please write a comment');
       return;
     }
-    if (!rentalId.trim() && !editingReview) {
-      setError('Please enter or generate a rental ID');
-      return;
-    }
 
     setLoading(true);
     try {
@@ -46,7 +37,6 @@ const ReviewForm = ({ itemId, currentUser, onReviewAdded, editingReview = null, 
         await createReview({
           reviewer: currentUser,
           item: itemId,
-          rentalId: rentalId.trim(),
           rating,
           comment: comment.trim(),
         });
@@ -54,7 +44,6 @@ const ReviewForm = ({ itemId, currentUser, onReviewAdded, editingReview = null, 
 
       setRating(0);
       setComment('');
-      setRentalId('');
       onReviewAdded();
       if (onCancelEdit) onCancelEdit();
     } catch (err) {
@@ -67,23 +56,6 @@ const ReviewForm = ({ itemId, currentUser, onReviewAdded, editingReview = null, 
   return (
     <form className="review-form" onSubmit={handleSubmit}>
       <h3>{editingReview ? 'Edit Review' : 'Write a Review'}</h3>
-
-      {!editingReview && (
-        <div className="form-group">
-          <label>Rental ID</label>
-          <div className="rental-id-row">
-            <input
-              type="text"
-              value={rentalId}
-              onChange={(e) => setRentalId(e.target.value)}
-              placeholder="e.g. RENTAL-001"
-            />
-            <button type="button" className="btn-generate" onClick={generateRentalId}>
-              Generate
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="form-group">
         <label>Rating</label>
