@@ -64,23 +64,22 @@ const MainDashboard = () => {
           </motion.div>
 
           <motion.div
-            className="role-card role-lender"
+            className="role-card role-lender role-coming-soon"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            whileHover={{ y: -6, boxShadow: '0 20px 50px rgba(40,28,89,0.3)' }}
-            onClick={() => navigate('/analytics')}
           >
-            <div className="role-card-icon">📊</div>
-            <h2>My Analytics</h2>
-            <p>Track your rental activity, savings, earnings, and trust score all in one place.</p>
+            <div className="coming-soon-tag">Coming Soon</div>
+            <div className="role-card-icon">🏷️</div>
+            <h2>Lender</h2>
+            <p>List your items for rent and earn money while helping fellow students on campus.</p>
             <ul className="role-features">
-              <li>📈 Savings & earnings summary</li>
-              <li>📋 Rental history</li>
-              <li>🛡️ Trust score & badges</li>
-              <li>🌟 Reviews received</li>
+              <li>📦 Add & manage listings</li>
+              <li>✅ Approve rental requests</li>
+              <li>💸 Track your earnings</li>
+              <li>📊 View lender analytics</li>
             </ul>
-            <div className="role-card-btn">View Analytics →</div>
+            <div className="role-card-btn role-card-btn-disabled">Available Soon</div>
           </motion.div>
         </div>
 
