@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  getAllItems, getAllUsers, getReviewsByItem,
+  getAllItems, getReviewsByItem,
   getStudentSummary, getRentalHistory, getTrustScore,
 } from '../../api/analyticsApi';
+import { useAuth } from '../../context/AuthContext';
 import StarRating from '../../components/StarRating';
 import ReviewForm from '../../components/ReviewForm';
 import ReviewList from '../../components/ReviewList';
@@ -10,10 +12,15 @@ import TrustScore from '../../components/TrustScore';
 import './AnalyticsDashboard.css';
 
 const AnalyticsDashboard = () => {
+  const { currentUser: authUser, logout } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Use logged-in user ID for analytics
+  const currentUser = authUser?._id || '';
+
   // Shared state
-  const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState('');
-  const [activeTab, setActiveTab] = useState('analytics');
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') === 'reviews' ? 'reviews' : 'analytics');
   const [loading, setLoading] = useState(true);
 
   // Analytics state
@@ -31,20 +38,12 @@ const AnalyticsDashboard = () => {
   const [editingReview, setEditingReview] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  // Load users and items on mount
+  // Load items on mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [usersRes, itemsRes] = await Promise.all([getAllUsers(), getAllItems()]);
-        setUsers(usersRes.data);
-        setItems(itemsRes.data);
-      } catch (err) {
-        console.error('Failed to load data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    getAllItems()
+      .then((res) => setItems(res.data))
+      .catch((err) => console.error('Failed to load items:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   // Fetch analytics when user changes
@@ -128,8 +127,6 @@ const AnalyticsDashboard = () => {
     return { label: 'Low Rated', className: 'badge-low' };
   };
 
-  const currentUserName = users.find((u) => u._id === currentUser)?.name || '';
-
   if (loading) return <div className="dashboard-loading">Loading...</div>;
 
   return (
@@ -137,18 +134,16 @@ const AnalyticsDashboard = () => {
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
+          <button className="dash-back-btn" onClick={() => navigate('/dashboard')}>← Dashboard</button>
           <h1>UNI NEST</h1>
           <span className="header-subtitle">Student Analytics & Reviews</span>
         </div>
         <div className="header-right">
-          <label>Logged in as:</label>
-          <select value={currentUser} onChange={(e) => setCurrentUser(e.target.value)}>
-            <option value="">-- Select User --</option>
-            {users.map((u) => (
-              <option key={u._id} value={u._id}>{u.name}</option>
-            ))}
-          </select>
-          {currentUserName && <span className="current-user-badge">{currentUserName}</span>}
+          <button className="dash-profile-btn" onClick={() => navigate('/profile')}>
+            <div className="dash-avatar">{authUser?.name?.charAt(0)}</div>
+            <span>{authUser?.name}</span>
+          </button>
+          <button className="dash-logout-btn" onClick={() => { logout(); navigate('/login'); }}>Sign Out</button>
         </div>
       </header>
 
@@ -367,7 +362,15 @@ const AnalyticsDashboard = () => {
                             </span>
                             <span className={`badge ${badge.className}`}>{badge.label}</span>
                           </div>
-                          <p className="item-owner">Lender: {item.lender?.name}</p>
+                          <p className="item-owner">
+                            Lender:{' '}
+                            <button
+                              className="lender-profile-link"
+                              onClick={(e) => { e.stopPropagation(); navigate(`/profile/${item.lender?._id}`); }}
+                            >
+                              {item.lender?.name}
+                            </button>
+                          </p>
                         </div>
                       </div>
                     );

@@ -6,6 +6,7 @@ import {
   deleteReview,
   getAllItems,
   getAllUsers,
+  loginUser,
 } from '../controllers/reviewController.js';
 import {
   getStudentSummary,
@@ -14,6 +15,9 @@ import {
 } from '../controllers/analyticsController.js';
 
 const router = express.Router();
+
+// Auth
+router.post('/login', loginUser);
 
 // Users & Items
 router.get('/users', getAllUsers);

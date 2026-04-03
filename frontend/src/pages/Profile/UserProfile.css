@@ -1,0 +1,252 @@
+/* Loading / Error states */
+.profile-loading {
+  display: flex; align-items: center; justify-content: center;
+  gap: 14px; min-height: 100vh;
+  font-size: 1rem; color: #6b7280;
+  background: #f5f6fa;
+}
+.profile-spinner {
+  width: 28px; height: 28px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #281C59;
+  border-radius: 50%;
+  animation: pspin 0.7s linear infinite;
+}
+@keyframes pspin { to { transform: rotate(360deg); } }
+.profile-error-page {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 100vh; gap: 14px;
+  background: #f5f6fa; color: #dc2626;
+}
+.profile-error-page button {
+  padding: 8px 20px; background: #281C59; color: #fff;
+  border: none; border-radius: 8px; cursor: pointer;
+}
+
+/* Page */
+.profile-page {
+  min-height: 100vh;
+  background: #f5f6fa;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Header */
+.profile-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 32px;
+  background: #281C59;
+  position: sticky; top: 0; z-index: 100;
+}
+.profile-back-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.profile-back-btn:hover { background: rgba(255,255,255,0.2); }
+.profile-header-brand { display: flex; align-items: center; gap: 8px; }
+.profile-brand-logo { font-size: 1.4rem; }
+.profile-brand-name { font-size: 1.2rem; font-weight: 900; color: #EDF7BD; }
+.profile-dash-btn {
+  background: #EDF7BD; color: #281C59;
+  border: none; padding: 6px 16px;
+  border-radius: 8px; font-weight: 700;
+  font-size: 0.85rem; cursor: pointer;
+}
+
+/* Body Layout */
+.profile-body {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 24px;
+}
+@media (max-width: 768px) {
+  .profile-body { grid-template-columns: 1fr; }
+}
+
+/* Sidebar */
+.profile-sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+/* User Card */
+.profile-user-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.profile-big-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #281C59, #4E8D9C);
+  color: #fff;
+  font-size: 1.8rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.profile-name {
+  font-size: 1.2rem; font-weight: 800;
+  color: #1a1a2e; margin: 0 0 4px;
+}
+.profile-email {
+  font-size: 0.82rem; color: #9ca3af;
+  margin: 0 0 10px;
+}
+.profile-own-tag {
+  display: inline-block;
+  background: #ede9fe; color: #5b21b6;
+  padding: 2px 10px; border-radius: 12px;
+  font-size: 0.75rem; font-weight: 600;
+  margin-bottom: 14px;
+}
+.profile-meta-row {
+  display: flex; align-items: center;
+  justify-content: center; gap: 12px;
+  margin-top: 8px;
+}
+.profile-meta-item { display: flex; flex-direction: column; align-items: center; }
+.pmeta-val  { font-size: 1.2rem; font-weight: 800; color: #281C59; }
+.pmeta-label { font-size: 0.72rem; color: #9ca3af; }
+.profile-meta-divider { width: 1px; height: 28px; background: #e5e7eb; }
+
+/* Trust Card */
+.profile-trust-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.profile-trust-card h3 {
+  font-size: 1rem; font-weight: 700;
+  color: #1a1a2e; margin: 0 0 16px;
+}
+
+/* Trust Meter */
+.ptrust-meter {
+  position: relative; width: 120px; height: 120px;
+  margin: 0 auto 12px;
+}
+.ptrust-circle { width: 100%; height: 100%; }
+.ptrust-meter-text {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); text-align: center;
+}
+.ptrust-score { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+.ptrust-outof { font-size: 0.8rem; color: #9ca3af; }
+
+/* Reliability badge */
+.ptrust-badge {
+  text-align: center;
+  padding: 4px 14px; border-radius: 20px;
+  font-size: 0.8rem; font-weight: 700;
+  display: block; width: fit-content;
+  margin: 0 auto 12px;
+}
+.ptrust-high   { background: #d1fae5; color: #065f46; }
+.ptrust-medium { background: #fef3c7; color: #92400e; }
+.ptrust-low    { background: #fee2e2; color: #991b1b; }
+
+/* Rating row */
+.ptrust-rating-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-bottom: 14px;
+}
+.ptrust-avg  { font-weight: 700; font-size: 0.9rem; }
+.ptrust-revcount { font-size: 0.75rem; color: #9ca3af; }
+
+/* Breakdown bars */
+.ptrust-breakdown { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.ptrust-bar-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.75rem; color: #6b7280;
+}
+.ptrust-bar-row > span:first-child { width: 44px; flex-shrink: 0; }
+.ptrust-bar-row > span:last-child  { width: 36px; flex-shrink: 0; text-align: right; font-weight: 600; color: #374151; }
+.ptrust-bar-bg {
+  flex: 1; height: 7px; background: #e5e7eb; border-radius: 4px; overflow: hidden;
+}
+.ptrust-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+/* Badges */
+.ptrust-badges { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.ptrust-badge-item {
+  display: flex; align-items: center; gap: 8px;
+  background: #f9fafb; border-radius: 8px; padding: 8px 10px;
+  font-size: 1rem;
+}
+.ptrust-badge-item > span { font-size: 1.2rem; flex-shrink: 0; }
+.ptrust-badge-item > div { display: flex; flex-direction: column; }
+.ptrust-badge-item strong { font-size: 0.8rem; color: #1a1a2e; }
+.ptrust-badge-item span   { font-size: 0.72rem; color: #9ca3af; }
+
+/* Main Sections */
+.profile-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  margin-bottom: 20px;
+}
+.profile-section h2 {
+  font-size: 1.1rem; font-weight: 700;
+  color: #1a1a2e; margin: 0 0 18px;
+}
+
+/* Savings & Earnings Cards */
+.pse-cards { display: flex; flex-direction: column; gap: 12px; }
+.pse-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 18px; border-radius: 12px;
+}
+.pse-savings  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.pse-spent    { background: #fefce8; border: 1px solid #fde68a; }
+.pse-earnings { background: #eff6ff; border: 1px solid #bfdbfe; }
+.pse-icon { font-size: 1.8rem; }
+.pse-info { display: flex; flex-direction: column; }
+.pse-label { font-size: 0.8rem; color: #6b7280; font-weight: 500; }
+.pse-value { font-size: 1.3rem; font-weight: 800; color: #1a1a2e; }
+.pse-sub   { font-size: 0.75rem; color: #9ca3af; }
+
+/* Recent Reviews */
+.profile-no-reviews {
+  color: #9ca3af; font-style: italic; text-align: center; padding: 24px 0;
+}
+.profile-reviews-list { display: flex; flex-direction: column; gap: 12px; }
+.profile-review-card {
+  padding: 14px 16px;
+  border: 1px solid #f0f0f0; border-radius: 12px;
+}
+.prv-header {
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;
+}
+.prv-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #4E8D9C; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+}
+.prv-meta { flex: 1; display: flex; flex-direction: column; }
+.prv-meta strong { font-size: 0.9rem; color: #1a1a2e; }
+.prv-item { font-size: 0.75rem; color: #9ca3af; }
+.prv-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.prv-date  { font-size: 0.72rem; color: #9ca3af; }
+.prv-comment { font-size: 0.88rem; color: #374151; line-height: 1.5; margin: 0; }
+
+/* Rental Activity (other user) */
+.pra-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+}
+@media (max-width: 500px) { .pra-stats { grid-template-columns: repeat(2,1fr); } }
+.pra-stat {
+  text-align: center; padding: 16px;
+  background: #f9fafb; border-radius: 10px;
+}
+.pra-val   { display: block; font-size: 1.5rem; font-weight: 800; color: #281C59; }
+.pra-label { display: block; font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }

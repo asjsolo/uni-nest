@@ -2,6 +2,9 @@ import axios from 'axios';
 
 const API = axios.create({ baseURL: '/api/analytics' });
 
+// Auth
+export const loginUser = (email, password) => API.post('/login', { email, password });
+
 // Users & Items
 export const getAllUsers = () => API.get('/users');
 export const getAllItems = () => API.get('/items');
