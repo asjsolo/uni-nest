@@ -4,7 +4,7 @@ import LoginPage from './pages/Login/LoginPage';
 import MainDashboard from './pages/Dashboard/MainDashboard';
 import UserProfile from './pages/Profile/UserProfile';
 import AnalyticsDashboard from './pages/Analytics/AnalyticsDashboard';
-import AdminDashboard from './pages/Admin/AdminDashboard';
+import InventoryPage from './pages/Inventory/InventoryPage';
 import './App.css';
 
 // Redirect to /login if not authenticated
@@ -25,8 +25,7 @@ function App() {
           <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
           <Route path="/profile/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
-          <Route path="/inventory" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/inventory" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

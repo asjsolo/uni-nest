@@ -83,48 +83,6 @@ const MainDashboard = () => {
           </motion.div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="quick-actions">
-          <h2>Quick Access</h2>
-          <div className="qa-grid">
-            <motion.button
-              className="qa-btn"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/profile')}
-            >
-              <span className="qa-icon">👤</span>
-              <span>My Profile</span>
-            </motion.button>
-            <motion.button
-              className="qa-btn"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/inventory')}
-            >
-              <span className="qa-icon">📦</span>
-              <span>Browse Items</span>
-            </motion.button>
-            <motion.button
-              className="qa-btn"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/analytics')}
-            >
-              <span className="qa-icon">📊</span>
-              <span>Analytics</span>
-            </motion.button>
-            <motion.button
-              className="qa-btn"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate('/analytics?tab=reviews')}
-            >
-              <span className="qa-icon">⭐</span>
-              <span>Reviews</span>
-            </motion.button>
-          </div>
-        </div>
       </div>
     </div>
   );

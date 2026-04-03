@@ -1,13 +1,5 @@
 import express from 'express';
-import {
-  createReview,
-  getReviewsByItem,
-  updateReview,
-  deleteReview,
-  getAllItems,
-  getAllUsers,
-  loginUser,
-} from '../controllers/reviewController.js';
+import { getAllItems, getAllUsers, loginUser } from '../controllers/reviewController.js';
 import {
   getStudentSummary,
   getRentalHistory,
@@ -27,11 +19,5 @@ router.get('/items', getAllItems);
 router.get('/summary/:userId', getStudentSummary);
 router.get('/rentals/:userId', getRentalHistory);
 router.get('/trust/:userId', getTrustScore);
-
-// Reviews CRUD
-router.post('/reviews', createReview);
-router.get('/reviews/item/:itemId', getReviewsByItem);
-router.put('/reviews/:reviewId', updateReview);
-router.delete('/reviews/:reviewId', deleteReview);
 
 export default router;
