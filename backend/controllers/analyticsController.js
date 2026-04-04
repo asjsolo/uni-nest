@@ -96,6 +96,29 @@ export const getRentalHistory = async (req, res) => {
   }
 };
 
+// @desc    Get all reviews received on items owned by a user
+// @route   GET /api/analytics/reviews/user/:userId
+export const getReviewsForUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const ownedItems = await Item.find({ lender: userId }).select('_id');
+    const ownedItemIds = ownedItems.map((i) => i._id);
+
+    const reviews = await Review.find({ item: { $in: ownedItemIds } })
+      .populate('reviewer', 'name email')
+      .populate('item', 'name category image')
+      .sort({ createdAt: -1 });
+
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get trust score for a user (based on reviews received on their items + rental activity)
 // @route   GET /api/analytics/trust/:userId
 export const getTrustScore = async (req, res) => {

@@ -252,6 +252,7 @@ const seedData = async () => {
 
     // ===== REVIEWS =====
     const reviews = await Review.insertMany([
+      // RENTAL-001: Bob borrowed calculator from Alice
       {
         reviewer: bob._id,
         item: calculator._id,
@@ -259,6 +260,7 @@ const seedData = async () => {
         rating: 5,
         comment: 'Calculator was in perfect condition. Alice is very reliable!',
       },
+      // RENTAL-002: Charlie borrowed calculator from Alice
       {
         reviewer: charlie._id,
         item: calculator._id,
@@ -266,6 +268,7 @@ const seedData = async () => {
         rating: 4,
         comment: 'Great calculator, worked perfectly for my exams.',
       },
+      // RENTAL-003: Diana borrowed textbook from Bob
       {
         reviewer: diana._id,
         item: textbook._id,
@@ -273,6 +276,7 @@ const seedData = async () => {
         rating: 4,
         comment: 'Textbook had some highlights but overall good condition.',
       },
+      // RENTAL-004: Alice borrowed racket from Charlie
       {
         reviewer: alice._id,
         item: racket._id,
@@ -280,6 +284,7 @@ const seedData = async () => {
         rating: 5,
         comment: 'Rackets were great! Had an awesome weekend game with friends.',
       },
+      // RENTAL-005: Ethan borrowed arduino from Alice
       {
         reviewer: ethan._id,
         item: arduino._id,
@@ -287,12 +292,29 @@ const seedData = async () => {
         rating: 3,
         comment: 'Kit was missing one sensor, but overall usable for my project.',
       },
+      // RENTAL-006: Bob borrowed drill from Ethan
       {
         reviewer: bob._id,
         item: drill._id,
         rentalId: 'RENTAL-006',
         rating: 5,
         comment: 'Drill was powerful and came fully charged. Ethan was very helpful.',
+      },
+      // RENTAL-007: Charlie borrowed labcoat from Diana
+      {
+        reviewer: charlie._id,
+        item: labcoat._id,
+        rentalId: 'RENTAL-007',
+        rating: 5,
+        comment: 'Lab coat was clean and perfectly pressed. Saved me for the chemistry lab!',
+      },
+      // RENTAL-008: Alice borrowed textbook from Bob
+      {
+        reviewer: alice._id,
+        item: textbook._id,
+        rentalId: 'RENTAL-008',
+        rating: 4,
+        comment: 'Very helpful textbook. Bob was quick to respond and hand it over.',
       },
     ]);
     console.log(`Created ${reviews.length} reviews`);

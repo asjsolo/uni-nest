@@ -129,28 +129,6 @@ const LoginPage = () => {
           </motion.button>
         </form>
 
-        {/* Demo credentials hint */}
-        <div className="login-demo-hint">
-          <p>Demo accounts (all use password: <code>password123</code>)</p>
-          <div className="demo-accounts">
-            {[
-              'alice@university.edu',
-              'bob@university.edu',
-              'charlie@university.edu',
-              'diana@university.edu',
-              'ethan@university.edu',
-            ].map((acc) => (
-              <button
-                key={acc}
-                type="button"
-                className="demo-account-btn"
-                onClick={() => { setEmail(acc); setPassword('password123'); setError(''); }}
-              >
-                {acc}
-              </button>
-            ))}
-          </div>
-        </div>
       </motion.div>
     </div>
   );

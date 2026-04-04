@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import { getStudentSummary, getTrustScore, getReviewsByItem, getAllItems } from '../../api/analyticsApi';
+import { getStudentSummary, getTrustScore, getReviewsForUser, getRentalHistory } from '../../api/analyticsApi';
 import StarRating from '../../components/StarRating';
 import './UserProfile.css';
 
@@ -21,6 +21,8 @@ const UserProfile = () => {
   const [summary, setSummary] = useState(null);
   const [trustData, setTrustData] = useState(null);
   const [recentReviews, setRecentReviews] = useState([]);
+  const [buyHistory, setBuyHistory] = useState([]);
+  const [rentalHistory, setRentalHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -33,33 +35,20 @@ const UserProfile = () => {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      // Fetch summary, trust score, and items in parallel
-      const [summaryRes, trustRes, itemsRes] = await Promise.all([
+      const [summaryRes, trustRes, reviewsRes, buyRes, lendRes] = await Promise.all([
         getStudentSummary(targetId),
         getTrustScore(targetId),
-        getAllItems(),
+        getReviewsForUser(targetId),
+        getRentalHistory(targetId, { role: 'borrower' }),
+        getRentalHistory(targetId, { role: 'lender' }),
       ]);
 
       setSummary(summaryRes.data);
       setTrustData(trustRes.data);
       setProfileUser(summaryRes.data.user);
-
-      // Get reviews for items owned by this user (up to 3 most recent)
-      const ownedItems = itemsRes.data.filter(
-        (item) => item.lender?._id === targetId || item.lender === targetId
-      );
-
-      // Fetch reviews for each owned item, flatten + take latest 3
-      const reviewArrays = await Promise.all(
-        ownedItems.slice(0, 4).map((item) =>
-          getReviewsByItem(item._id).then((r) => r.data.reviews).catch(() => [])
-        )
-      );
-      const allReviews = reviewArrays
-        .flat()
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5);
-      setRecentReviews(allReviews);
+      setRecentReviews(reviewsRes.data.slice(0, 5));
+      setBuyHistory(buyRes.data);
+      setRentalHistory(lendRes.data);
     } catch (err) {
       setError('Failed to load profile data.');
     } finally {
@@ -257,12 +246,108 @@ const UserProfile = () => {
             </motion.div>
           )}
 
+          {/* Buy History Table (own profile only) */}
+          {isOwnProfile && (
+            <motion.div
+              className="profile-section"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              <h2>Buy History <span className="ph-count">({buyHistory.length})</span></h2>
+              {buyHistory.length === 0 ? (
+                <p className="ph-empty">No items rented as buyer yet.</p>
+              ) : (
+                <div className="ph-table-wrap">
+                  <table className="ph-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Lender</th>
+                        <th>Duration</th>
+                        <th>Spent</th>
+                        <th>Saved</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {buyHistory.map((r) => (
+                        <tr key={r._id}>
+                          <td className="ph-item-cell">
+                            {r.item?.image && <img src={r.item.image} alt={r.itemName} className="ph-thumb" />}
+                            <span>{r.itemName}</span>
+                          </td>
+                          <td>{r.lender?.name}</td>
+                          <td>{r.durationDays}d</td>
+                          <td className="ph-cost">Rs.{r.totalCost}</td>
+                          <td className="ph-saved">Rs.{Math.max(0, r.marketPrice * r.durationDays - r.totalCost)}</td>
+                          <td><span className={`ph-status ph-${r.status}`}>{r.status}</span></td>
+                          <td className="ph-date">
+                            {new Date(r.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Rental History Table (own profile only) */}
+          {isOwnProfile && (
+            <motion.div
+              className="profile-section"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.25 }}
+            >
+              <h2>Rental History <span className="ph-count">({rentalHistory.length})</span></h2>
+              {rentalHistory.length === 0 ? (
+                <p className="ph-empty">No items lent out yet.</p>
+              ) : (
+                <div className="ph-table-wrap">
+                  <table className="ph-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Borrower</th>
+                        <th>Duration</th>
+                        <th>Earned</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rentalHistory.map((r) => (
+                        <tr key={r._id}>
+                          <td className="ph-item-cell">
+                            {r.item?.image && <img src={r.item.image} alt={r.itemName} className="ph-thumb" />}
+                            <span>{r.itemName}</span>
+                          </td>
+                          <td>{r.borrower?.name}</td>
+                          <td>{r.durationDays}d</td>
+                          <td className="ph-cost">Rs.{r.totalCost}</td>
+                          <td><span className={`ph-status ph-${r.status}`}>{r.status}</span></td>
+                          <td className="ph-date">
+                            {new Date(r.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </motion.div>
+          )}
+
           {/* Recent Feedback / Reviews */}
           <motion.div
             className="profile-section"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
           >
             <h2>Recent Feedback</h2>
             {recentReviews.length === 0 ? (
@@ -293,35 +378,6 @@ const UserProfile = () => {
             )}
           </motion.div>
 
-          {/* Rental Summary (non-own: show basic stats) */}
-          {!isOwnProfile && summary && (
-            <motion.div
-              className="profile-section"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.25 }}
-            >
-              <h2>Rental Activity</h2>
-              <div className="pra-stats">
-                <div className="pra-stat">
-                  <span className="pra-val">{summary.asBorrower.completedRentals}</span>
-                  <span className="pra-label">Items Borrowed</span>
-                </div>
-                <div className="pra-stat">
-                  <span className="pra-val">{summary.asLender.completedRentals}</span>
-                  <span className="pra-label">Items Lent</span>
-                </div>
-                <div className="pra-stat">
-                  <span className="pra-val">{summary.totalCompleted}</span>
-                  <span className="pra-label">Total Completed</span>
-                </div>
-                <div className="pra-stat">
-                  <span className="pra-val">{summary.totalOngoing}</span>
-                  <span className="pra-label">Ongoing</span>
-                </div>
-              </div>
-            </motion.div>
-          )}
         </main>
       </div>
     </div>

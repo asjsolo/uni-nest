@@ -329,6 +329,86 @@
 .pra-val   { display: block; font-size: var(--text-2xl); font-weight: 800; color: var(--clr-brand); }
 .pra-label { display: block; font-size: var(--text-xs); color: var(--clr-gray-400); margin-top: 2px; }
 
+/* ── Profile History Tables ───────────────────────────────── */
+.ph-count {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--clr-gray-400);
+}
+
+.ph-empty {
+  color: var(--clr-gray-400);
+  font-style: italic;
+  text-align: center;
+  padding: var(--sp-5) 0;
+  margin: 0;
+}
+
+.ph-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--clr-gray-100);
+}
+
+.ph-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.ph-table th {
+  background: var(--clr-brand);
+  color: var(--clr-lime);
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.ph-table th:first-child { border-radius: var(--r-lg) 0 0 0; }
+.ph-table th:last-child  { border-radius: 0 var(--r-lg) 0 0; }
+
+.ph-table td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--clr-gray-100);
+  color: var(--clr-gray-800);
+  vertical-align: middle;
+}
+.ph-table tbody tr:last-child td { border-bottom: none; }
+.ph-table tbody tr:hover { background: var(--clr-gray-50); }
+
+.ph-item-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 600;
+  color: var(--clr-gray-900);
+}
+.ph-thumb {
+  width: 30px; height: 30px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ph-cost  { font-weight: 700; color: var(--clr-brand); }
+.ph-saved { font-weight: 600; color: #059669; }
+.ph-date  { white-space: nowrap; color: var(--clr-gray-400); font-size: var(--text-xs); }
+
+.ph-status {
+  display: inline-block;
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.ph-completed { background: #dcfce7; color: #166534; }
+.ph-ongoing   { background: #dbeafe; color: #1d4ed8; }
+.ph-cancelled { background: #fee2e2; color: #991b1b; }
+
 /* Responsive */
 @media (max-width: 600px) {
   .profile-header  { padding: 0 var(--sp-4); }

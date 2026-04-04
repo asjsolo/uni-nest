@@ -4,6 +4,7 @@ import {
   getStudentSummary,
   getRentalHistory,
   getTrustScore,
+  getReviewsForUser,
 } from '../controllers/analyticsController.js';
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.get('/items', getAllItems);
 router.get('/summary/:userId', getStudentSummary);
 router.get('/rentals/:userId', getRentalHistory);
 router.get('/trust/:userId', getTrustScore);
+router.get('/reviews/user/:userId', getReviewsForUser);
 
 export default router;

@@ -14,6 +14,7 @@ export const getStudentSummary = (userId) => API.get(`/summary/${userId}`);
 export const getRentalHistory = (userId, params = {}) =>
   API.get(`/rentals/${userId}`, { params });
 export const getTrustScore = (userId) => API.get(`/trust/${userId}`);
+export const getReviewsForUser = (userId) => API.get(`/reviews/user/${userId}`);
 
 // Reviews
 export const getReviewsByItem = (itemId) => API.get(`/reviews/${itemId}`);

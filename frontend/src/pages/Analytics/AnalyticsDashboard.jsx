@@ -4,8 +4,10 @@ import {
   getStudentSummary,
   getRentalHistory,
   getTrustScore,
+  getReviewsForUser,
 } from '../../api/analyticsApi';
 import { useAuth } from '../../context/AuthContext';
+import StarRating from '../../components/StarRating';
 import TrustScore from '../../components/TrustScore';
 import './AnalyticsDashboard.css';
 
@@ -20,6 +22,7 @@ const AnalyticsDashboard = () => {
   const [trustData, setTrustData] = useState(null);
   const [rentals, setRentals] = useState([]);
   const [rentalFilter, setRentalFilter] = useState({ status: '', role: '' });
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     if (currentUser) {
@@ -27,6 +30,7 @@ const AnalyticsDashboard = () => {
         fetchSummary(),
         fetchRentals(),
         fetchTrustScore(),
+        fetchReviews(),
       ]).finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -52,6 +56,15 @@ const AnalyticsDashboard = () => {
       setTrustData(res.data);
     } catch (err) {
       console.error('Failed to load trust score:', err);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const res = await getReviewsForUser(currentUser);
+      setReviews(res.data);
+    } catch (err) {
+      console.error('Failed to load reviews:', err);
     }
   };
 
@@ -155,6 +168,35 @@ const AnalyticsDashboard = () => {
 
             {/* Trust Score */}
             <TrustScore trustData={trustData} />
+
+            {/* Reviews Received */}
+            <div className="reviews-received-section">
+              <h2>Reviews Received</h2>
+              {reviews.length === 0 ? (
+                <div className="empty-rentals">No reviews received on your items yet.</div>
+              ) : (
+                <div className="reviews-received-list">
+                  {reviews.map((review) => (
+                    <div key={review._id} className="received-review-card">
+                      <div className="rr-top">
+                        <div className="rr-avatar">{review.reviewer?.name?.charAt(0)}</div>
+                        <div className="rr-meta">
+                          <strong>{review.reviewer?.name}</strong>
+                          <span>on <em>{review.item?.name}</em></span>
+                        </div>
+                        <div className="rr-right">
+                          <StarRating rating={review.rating} size={15} />
+                          <span className="rr-date">
+                            {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="rr-comment">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Rental History */}
             <div className="rental-history-section">
