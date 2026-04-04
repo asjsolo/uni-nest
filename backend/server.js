@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import inventoryRoutes from './routes/inventoryLenderRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
+import bookingRoutes from './routes/bookingRoutes.js';
+import { checkOverdueBookings } from './controllers/bookingController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,12 +30,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/inventory', inventoryRoutes);
-app.use('/api/admin', adminRoutes);
-
-// Routes Placeholders
-// app.use('/api/borrowing', borrowingRoutes); // Member 2
-// app.use('/api/analytics', analyticsRoutes); // Member 3
-// app.use('/api/admin', adminRoutes);         // Member 4
+app.use('/api/bookings', bookingRoutes);
 
 app.get('/', (req, res) => {
   res.send('UNI NEST API is running...');
@@ -44,4 +40,8 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Auto-check overdue bookings every hour
+  checkOverdueBookings(); // run once on startup
+  setInterval(checkOverdueBookings, 60 * 60 * 1000);
 });

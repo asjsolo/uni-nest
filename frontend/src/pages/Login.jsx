@@ -11,46 +11,14 @@ const Login = () => {
   const selectedRole = location.state?.role || 'borrower';
   const isLender = selectedRole === 'lender';
 
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [touched, setTouched] = useState({});
-
-  // Validation functions
-  const isValidPhone = (value) => /^\d{10}$/.test(value);
-  const isValidEmail = (value) => /^(IT|EN|BM|BT)\d{8}@/.test(value);
-  const isValidStudentId = (value) => /^(IT|EN|BM|BT)\d{8}$/.test(value);
-
-  // Validation status
-  const validations = {
-    fullName: fullName.trim() !== '',
-    phone: isValidPhone(phone),
-    email: email !== '' && isValidEmail(email),
-    studentId: studentId !== '' && isValidStudentId(studentId),
-  };
-
-  const getInputClass = (field) => {
-    if (!touched[field]) return '';
-    return validations[field] ? 'input-valid' : 'input-invalid';
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    // Mark all fields as touched
-    setTouched({ fullName: true, phone: true, email: true, studentId: true });
-
-    // Validate all fields
-    if (!validations.fullName || !validations.phone || !validations.email || !validations.studentId) {
-      setError('Please fill in all fields correctly.');
-      return;
-    }
-
     setLoading(true);
     try {
       const user = await login(email, password);

@@ -6,45 +6,53 @@ import './LenderDashboard.css';
 
 const CATEGORIES = ['All', 'Electronics', 'Books', 'Tools', 'Clothing', 'Sports', 'Furniture', 'Kitchen', 'Other'];
 const AVAILABILITY_OPTIONS = ['All', 'Available', 'Out of Stock'];
+const TABS = ['My Listings', 'Drafts', 'Overdue Rentals'];
 
 const LenderDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [activeTab, setActiveTab] = useState('My Listings');
   const [items, setItems] = useState([]);
+  const [drafts, setDrafts] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [loadingItems, setLoadingItems] = useState(true);
+  const [loadingBookings, setLoadingBookings] = useState(true);
   const [fetchError, setFetchError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Filters
+  // Filters (listings only)
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [availability, setAvailability] = useState('All');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  const handleLogout = () => { logout(); navigate('/'); };
 
-  // Show success toast when redirected after listing
+  // ─── Toast from navigation state ─────────────────────────
   useEffect(() => {
     if (location.state?.itemListed) {
-      setSuccessMsg('🎉 Item listed successfully!');
-      // Clear the state so refresh doesn't re-show
+      setSuccessMsg('🎉 Item published successfully!');
+      window.history.replaceState({}, '');
+      setTimeout(() => setSuccessMsg(''), 4000);
+    }
+    if (location.state?.draftSaved) {
+      setSuccessMsg('📝 Draft saved successfully!');
+      setActiveTab('Drafts');
       window.history.replaceState({}, '');
       setTimeout(() => setSuccessMsg(''), 4000);
     }
   }, [location.state]);
 
+  // ─── Fetch published items ────────────────────────────────
   const fetchItems = useCallback(async () => {
     setLoadingItems(true);
     setFetchError('');
     try {
       const token = localStorage.getItem('token');
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ status: 'published' });
       if (search) params.append('search', search);
       if (category !== 'All') params.append('category', category);
       if (availability !== 'All') params.append('availability', availability);
@@ -64,10 +72,36 @@ const LenderDashboard = () => {
     }
   }, [search, category, availability, minPrice, maxPrice]);
 
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+  // ─── Fetch drafts ─────────────────────────────────────────
+  const fetchDrafts = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/inventory/my-items?status=draft`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) setDrafts(data);
+    } catch {}
+  }, []);
 
+  // ─── Fetch lender bookings ────────────────────────────────
+  const fetchBookings = useCallback(async () => {
+    setLoadingBookings(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/lender-bookings`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) setBookings(data);
+    } catch {} finally {
+      setLoadingBookings(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchItems(); fetchDrafts(); fetchBookings(); }, [fetchItems, fetchDrafts, fetchBookings]);
+
+  // ─── Item actions ─────────────────────────────────────────
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
     try {
@@ -76,43 +110,86 @@ const LenderDashboard = () => {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message);
-      }
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
       setItems((prev) => prev.filter((i) => i._id !== itemId));
-      setSuccessMsg('Item deleted successfully.');
+      setDrafts((prev) => prev.filter((i) => i._id !== itemId));
+      setSuccessMsg('Item deleted.');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
       setFetchError(err.message || 'Failed to delete item.');
     }
   };
 
-  const stats = [
-    { label: 'Items Listed', value: items.length.toString(), icon: '📦' },
-    {
-      label: 'Available',
-      value: items.filter((i) => i.availabilityStatus === 'Available').length.toString(),
-      icon: '✅',
-    },
-    {
-      label: 'Out of Stock',
-      value: items.filter((i) => i.availabilityStatus === 'Out of Stock').length.toString(),
-      icon: '❌',
-    },
-    { label: 'Rating', value: '—', icon: '⭐' },
-  ];
+  const handlePublishDraft = async (draft) => {
+    // Prevent quick publish if draft has placeholder defaults
+    if (draft.name === 'Untitled Draft' || draft.pricePerDay === 0 || !draft.description) {
+      alert('Please fill out all required details before publishing this draft.');
+      navigate('/list-item', { state: { draft } });
+      return;
+    }
 
-  const resetFilters = () => {
-    setSearch('');
-    setCategory('All');
-    setAvailability('All');
-    setMinPrice('');
-    setMaxPrice('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/inventory/items/${draft._id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'published' }),
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      setSuccessMsg('🎉 Draft published!');
+      setActiveTab('My Listings');
+      fetchItems(); fetchDrafts();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setFetchError(err.message || 'Failed to publish draft.');
+    }
   };
 
-  const hasActiveFilters =
-    search || category !== 'All' || availability !== 'All' || minPrice || maxPrice;
+  // ─── Booking actions ──────────────────────────────────────
+  const handleMarkReturned = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingId}/mark-returned`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      setSuccessMsg('✅ Marked as returned.');
+      fetchBookings();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setFetchError(err.message || 'Failed to mark returned.');
+    }
+  };
+
+  const handleCollectFine = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingId}/collect-fine`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      setSuccessMsg('💰 Fine collected!');
+      fetchBookings();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setFetchError(err.message || 'Failed to collect fine.');
+    }
+  };
+
+  const overdueBookings = bookings.filter((b) => b.status === 'overdue');
+  const activeBookings = bookings.filter((b) => b.status === 'active');
+
+  const stats = [
+    { label: 'Items Listed', value: items.length.toString(), icon: '📦' },
+    { label: 'Drafts', value: drafts.length.toString(), icon: '📝' },
+    { label: 'Active Rentals', value: activeBookings.length.toString(), icon: '🔄' },
+    { label: 'Overdue', value: overdueBookings.length.toString(), icon: '⚠️' },
+  ];
+
+  const resetFilters = () => { setSearch(''); setCategory('All'); setAvailability('All'); setMinPrice(''); setMaxPrice(''); };
+  const hasActiveFilters = search || category !== 'All' || availability !== 'All' || minPrice || maxPrice;
 
   return (
     <>
@@ -136,26 +213,13 @@ const LenderDashboard = () => {
           </div>
 
           <nav className="sidebar-nav">
-            <a href="#" className="nav-item active">
-              <span className="nav-icon">📊</span> Dashboard
-            </a>
-            <a href="#" className="nav-item">
-              <span className="nav-icon">📦</span> My Listings
-            </a>
-            <a href="#" className="nav-item">
-              <span className="nav-icon">📋</span> Requests
-            </a>
-            <a href="#" className="nav-item">
-              <span className="nav-icon">💬</span> Messages
-            </a>
-            <a href="#" className="nav-item">
-              <span className="nav-icon">⚙️</span> Settings
-            </a>
+            <a href="#" className="nav-item active"><span className="nav-icon">📊</span> Dashboard</a>
+            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); setActiveTab('My Listings'); }}><span className="nav-icon">📦</span> My Listings</a>
+            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); setActiveTab('Drafts'); }}><span className="nav-icon">📝</span> Drafts {drafts.length > 0 && <span className="nav-badge">{drafts.length}</span>}</a>
+            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); setActiveTab('Overdue Rentals'); }}><span className="nav-icon">⚠️</span> Overdue {overdueBookings.length > 0 && <span className="nav-badge overdue-badge">{overdueBookings.length}</span>}</a>
           </nav>
 
-          <button className="sidebar-logout" onClick={handleLogout}>
-            <span>🚪</span> Sign Out
-          </button>
+          <button className="sidebar-logout" onClick={handleLogout}><span>🚪</span> Sign Out</button>
         </aside>
 
         {/* Main content */}
@@ -167,26 +231,15 @@ const LenderDashboard = () => {
                 Good day, <span className="lender-highlight">{user?.fullname?.split(' ')[0]}</span> 👋
               </h1>
               <p className="dashboard-date">
-                {new Date().toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             </div>
-            <button className="add-item-btn" onClick={() => navigate('/list-item')}>
-              + Add New Item
-            </button>
+            <button className="add-item-btn" onClick={() => navigate('/list-item')}>+ Add New Item</button>
           </div>
 
-          {/* Feedback messages */}
-          {successMsg && (
-            <div className="alert-success fade-up">✅ {successMsg}</div>
-          )}
-          {fetchError && (
-            <div className="alert-error fade-up">⚠️ {fetchError}</div>
-          )}
+          {/* Feedback */}
+          {successMsg && <div className="alert-success fade-up">✅ {successMsg}</div>}
+          {fetchError && <div className="alert-error fade-up">⚠️ {fetchError}</div>}
 
           {/* Stats Grid */}
           <div className="stats-grid fade-up" style={{ animationDelay: '0.1s' }}>
@@ -201,141 +254,174 @@ const LenderDashboard = () => {
             ))}
           </div>
 
-          {/* Profile Details + Quick Actions */}
+          {/* Profile + Quick Actions */}
           <div className="content-grid fade-up" style={{ animationDelay: '0.2s' }}>
             <div className="glass-card info-card">
               <h3 className="card-heading">Account Details</h3>
               <div className="info-list">
-                <div className="info-row">
-                  <span className="info-label">📧 Email</span>
-                  <span className="info-val">{user?.email}</span>
-                </div>
-                <div className="info-row">
-                  <span className="info-label">📱 Phone</span>
-                  <span className="info-val">{user?.phonenumber}</span>
-                </div>
-                <div className="info-row">
-                  <span className="info-label">🎓 Reg. No.</span>
-                  <span className="info-val">{user?.campusRegistrationNumber}</span>
-                </div>
-                <div className="info-row">
-                  <span className="info-label">🎭 Role</span>
-                  <span className="info-val lender-highlight" style={{ textTransform: 'capitalize' }}>
-                    {user?.role}
-                  </span>
-                </div>
+                <div className="info-row"><span className="info-label">📧 Email</span><span className="info-val">{user?.email}</span></div>
+                <div className="info-row"><span className="info-label">📱 Phone</span><span className="info-val">{user?.phonenumber}</span></div>
+                <div className="info-row"><span className="info-label">🎓 Reg. No.</span><span className="info-val">{user?.campusRegistrationNumber}</span></div>
+                <div className="info-row"><span className="info-label">🎭 Role</span><span className="info-val lender-highlight" style={{ textTransform: 'capitalize' }}>{user?.role}</span></div>
               </div>
             </div>
 
             <div className="glass-card info-card">
               <h3 className="card-heading">Quick Actions</h3>
               <div className="quick-actions lender-actions">
-                <button className="action-btn" onClick={() => navigate('/list-item')}>
-                  📦 List a New Item
-                </button>
-                <button className="action-btn">📋 View All Requests</button>
-                <button className="action-btn">💬 Open Messages</button>
-                <button className="action-btn">📈 View Analytics</button>
+                <button className="action-btn" onClick={() => navigate('/list-item')}>📦 List a New Item</button>
+                <button className="action-btn" onClick={() => setActiveTab('Drafts')}>📝 View Drafts</button>
+                <button className="action-btn" onClick={() => setActiveTab('Overdue Rentals')}>⚠️ Overdue Rentals</button>
+                <button className="action-btn" onClick={() => setActiveTab('My Listings')}>📋 My Listings</button>
               </div>
             </div>
           </div>
 
-          {/* ─── My Listings Section ─── */}
+          {/* ─── Tabs Section ─── */}
           <div className="glass-card listings-section fade-up" style={{ animationDelay: '0.3s' }}>
-            <div className="listings-header">
-              <h3 className="card-heading" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-                📦 My Listings
-              </h3>
-              <span className="listings-count">{items.length} item{items.length !== 1 ? 's' : ''}</span>
-            </div>
-
-            {/* Search + Filter Bar */}
-            <div className="filter-bar">
-              <div className="search-wrapper">
-                <span className="search-icon">🔍</span>
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="Search your listings…"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-
-              <select
-                className="filter-select"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c === 'All' ? '📂 All Categories' : c}</option>
-                ))}
-              </select>
-
-              <select
-                className="filter-select"
-                value={availability}
-                onChange={(e) => setAvailability(e.target.value)}
-              >
-                {AVAILABILITY_OPTIONS.map((a) => (
-                  <option key={a} value={a}>{a === 'All' ? '🔄 All Status' : a}</option>
-                ))}
-              </select>
-
-              <div className="price-range-group">
-                <input
-                  type="number"
-                  className="price-input"
-                  placeholder="Min Rs."
-                  min="0"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                />
-                <span className="price-separator">–</span>
-                <input
-                  type="number"
-                  className="price-input"
-                  placeholder="Max Rs."
-                  min="0"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                />
-              </div>
-
-              {hasActiveFilters && (
-                <button className="reset-filter-btn" onClick={resetFilters}>
-                  ✕ Clear
+            {/* Tab Bar */}
+            <div className="tab-bar">
+              {TABS.map((tab) => (
+                <button
+                  key={tab}
+                  className={`tab-btn ${activeTab === tab ? 'tab-active' : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab === 'My Listings' && '📦 '}
+                  {tab === 'Drafts' && '📝 '}
+                  {tab === 'Overdue Rentals' && '⚠️ '}
+                  {tab}
+                  {tab === 'Drafts' && drafts.length > 0 && <span className="tab-count">{drafts.length}</span>}
+                  {tab === 'Overdue Rentals' && overdueBookings.length > 0 && <span className="tab-count overdue-count">{overdueBookings.length}</span>}
                 </button>
-              )}
+              ))}
             </div>
 
-            {/* Items Grid */}
-            {loadingItems ? (
-              <div className="listings-loading">
-                <div className="loading-spinner" />
-                <p>Loading your items…</p>
-              </div>
-            ) : items.length === 0 ? (
-              <div className="empty-state" style={{ boxShadow: 'none', border: 'none', background: 'transparent' }}>
-                <div className="empty-icon">📭</div>
-                <h3>{hasActiveFilters ? 'No items match your filters.' : 'No items listed yet'}</h3>
-                <p>
-                  {hasActiveFilters
-                    ? 'Try adjusting your search or filters.'
-                    : 'Start by adding your first item to make it available for borrowing.'}
-                </p>
-                {!hasActiveFilters && (
-                  <button className="btn-empty lender-btn-empty" onClick={() => navigate('/list-item')}>
-                    + List Your First Item
-                  </button>
+            {/* ─── MY LISTINGS TAB ─── */}
+            {activeTab === 'My Listings' && (
+              <>
+                <div className="listings-header">
+                  <h3 className="card-heading" style={{ borderBottom: 'none', paddingBottom: 0 }}>Published Items</h3>
+                  <span className="listings-count">{items.length} item{items.length !== 1 ? 's' : ''}</span>
+                </div>
+
+                {/* Filter Bar */}
+                <div className="filter-bar">
+                  <div className="search-wrapper">
+                    <span className="search-icon">🔍</span>
+                    <input type="text" className="search-input" placeholder="Search your listings…" value={search} onChange={(e) => setSearch(e.target.value)} />
+                  </div>
+                  <select className="filter-select" value={category} onChange={(e) => setCategory(e.target.value)}>
+                    {CATEGORIES.map((c) => (<option key={c} value={c}>{c === 'All' ? '📂 All Categories' : c}</option>))}
+                  </select>
+                  <select className="filter-select" value={availability} onChange={(e) => setAvailability(e.target.value)}>
+                    {AVAILABILITY_OPTIONS.map((a) => (<option key={a} value={a}>{a === 'All' ? '🔄 All Status' : a}</option>))}
+                  </select>
+                  <div className="price-range-group">
+                    <input type="number" className="price-input" placeholder="Min Rs." min="0" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+                    <span className="price-separator">–</span>
+                    <input type="number" className="price-input" placeholder="Max Rs." min="0" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+                  </div>
+                  {hasActiveFilters && <button className="reset-filter-btn" onClick={resetFilters}>✕ Clear</button>}
+                </div>
+
+                {loadingItems ? (
+                  <div className="listings-loading"><div className="loading-spinner" /><p>Loading your items…</p></div>
+                ) : items.length === 0 ? (
+                  <div className="empty-state" style={{ boxShadow: 'none', border: 'none', background: 'transparent' }}>
+                    <div className="empty-icon">📭</div>
+                    <h3>{hasActiveFilters ? 'No items match your filters.' : 'No published items yet'}</h3>
+                    <p>{hasActiveFilters ? 'Try adjusting your search or filters.' : 'Start by adding your first item.'}</p>
+                    {!hasActiveFilters && <button className="btn-empty lender-btn-empty" onClick={() => navigate('/list-item')}>+ List Your First Item</button>}
+                  </div>
+                ) : (
+                  <div className="items-grid">
+                    {items.map((item) => (
+                      <ItemCard 
+                        key={item._id} 
+                        item={item} 
+                        onDelete={handleDeleteItem} 
+                        onEdit={() => navigate('/list-item', { state: { item } })}
+                        isRented={bookings.some(b => b.item?._id === item._id && ['active', 'overdue'].includes(b.status))}
+                      />
+                    ))}
+                  </div>
                 )}
-              </div>
-            ) : (
-              <div className="items-grid">
-                {items.map((item) => (
-                  <ItemCard key={item._id} item={item} onDelete={handleDeleteItem} />
-                ))}
-              </div>
+              </>
+            )}
+
+            {/* ─── DRAFTS TAB ─── */}
+            {activeTab === 'Drafts' && (
+              <>
+                <div className="listings-header">
+                  <h3 className="card-heading" style={{ borderBottom: 'none', paddingBottom: 0 }}>📝 Saved Drafts</h3>
+                  <span className="listings-count">{drafts.length} draft{drafts.length !== 1 ? 's' : ''}</span>
+                </div>
+                {drafts.length === 0 ? (
+                  <div className="empty-state" style={{ boxShadow: 'none', border: 'none', background: 'transparent' }}>
+                    <div className="empty-icon">📝</div>
+                    <h3>No drafts saved</h3>
+                    <p>Start filling out a listing and save as draft to continue later.</p>
+                    <button className="btn-empty lender-btn-empty" onClick={() => navigate('/list-item')}>+ Create a New Listing</button>
+                  </div>
+                ) : (
+                  <div className="items-grid">
+                    {drafts.map((draft) => (
+                      <DraftCard
+                        key={draft._id}
+                        draft={draft}
+                        onEdit={() => navigate('/list-item', { state: { draft } })}
+                        onPublish={() => handlePublishDraft(draft)}
+                        onDelete={() => handleDeleteItem(draft._id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ─── OVERDUE RENTALS TAB ─── */}
+            {activeTab === 'Overdue Rentals' && (
+              <>
+                <div className="listings-header">
+                  <h3 className="card-heading" style={{ borderBottom: 'none', paddingBottom: 0 }}>⚠️ Overdue Rentals</h3>
+                  <span className="listings-count overdue-count-text">{overdueBookings.length} overdue</span>
+                </div>
+                {loadingBookings ? (
+                  <div className="listings-loading"><div className="loading-spinner" /><p>Loading bookings…</p></div>
+                ) : overdueBookings.length === 0 ? (
+                  <div className="empty-state" style={{ boxShadow: 'none', border: 'none', background: 'transparent' }}>
+                    <div className="empty-icon">✅</div>
+                    <h3>No overdue rentals</h3>
+                    <p>All items have been returned on time.</p>
+                  </div>
+                ) : (
+                  <div className="overdue-list">
+                    {overdueBookings.map((b) => (
+                      <OverdueCard
+                        key={b._id}
+                        booking={b}
+                        onMarkReturned={() => handleMarkReturned(b._id)}
+                        onCollectFine={() => handleCollectFine(b._id)}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Also show all active bookings for reference */}
+                {activeBookings.length > 0 && (
+                  <div style={{ marginTop: '24px' }}>
+                    <h4 style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
+                      🔄 Active Rentals ({activeBookings.length})
+                    </h4>
+                    <div className="overdue-list">
+                      {activeBookings.map((b) => (
+                        <ActiveBookingCard key={b._id} booking={b} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </main>
@@ -344,22 +430,16 @@ const LenderDashboard = () => {
   );
 };
 
-// ─── Item Card Component ─────────────────────────────────────────
-const ItemCard = ({ item, onDelete }) => {
-  const discountedPrice =
-    item.discountPercentage > 0
-      ? item.pricePerDay * (1 - item.discountPercentage / 100)
-      : null;
+// ─── Item Card ────────────────────────────────────────────────
+const ItemCard = ({ item, onDelete, onEdit, isRented }) => {
+  const discountedPrice = item.discountPercentage > 0
+    ? item.pricePerDay * (1 - item.discountPercentage / 100) : null;
 
   return (
     <div className="item-card glass-card">
       <div className="item-card-image">
         {item.image ? (
-          <img
-            src={`http://localhost:5000${item.image}`}
-            alt={item.name}
-            className="item-img"
-          />
+          <img src={`http://localhost:5000${item.image}`} alt={item.name} className="item-img" />
         ) : (
           <div className="item-img-placeholder">📦</div>
         )}
@@ -367,7 +447,6 @@ const ItemCard = ({ item, onDelete }) => {
           {item.availabilityStatus === 'Available' ? '✅ Available' : '❌ Out of Stock'}
         </div>
       </div>
-
       <div className="item-card-body">
         <div className="item-card-top">
           <div>
@@ -386,19 +465,133 @@ const ItemCard = ({ item, onDelete }) => {
             )}
           </div>
         </div>
-
         <p className="item-description">{item.description}</p>
-
         <div className="item-meta">
           <span className="item-meta-chip">📦 Qty: {item.quantity}</span>
           <span className="item-meta-chip">📅 {item.minRentalDays}–{item.maxRentalDays} days</span>
           <span className="item-meta-chip">📍 {item.pickupLocation}</span>
+          {item.finePerDay > 0 && <span className="item-meta-chip fine-chip">⚠️ Rs. {item.finePerDay}/day fine</span>}
         </div>
-
         <div className="item-card-actions">
-          <button className="item-action-btn item-action-delete" onClick={() => onDelete(item._id)}>
-            🗑️ Delete
+          <button 
+            className="item-action-btn draft-edit-btn" 
+            onClick={onEdit} 
+            disabled={isRented}
+            title={isRented ? "Cannot edit an item while it is currently rented" : "Edit item"}
+            style={isRented ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+          >
+            ✏️ Edit
           </button>
+          <button className="item-action-btn item-action-delete" onClick={() => onDelete(item._id)}>🗑️ Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Draft Card ───────────────────────────────────────────────
+const DraftCard = ({ draft, onEdit, onPublish, onDelete }) => (
+  <div className="item-card glass-card draft-card">
+    <div className="item-card-image">
+      {draft.image ? (
+        <img src={`http://localhost:5000${draft.image}`} alt={draft.name} className="item-img" />
+      ) : (
+        <div className="item-img-placeholder">📝</div>
+      )}
+      <div className="item-status-badge draft-status-badge">📝 Draft</div>
+    </div>
+    <div className="item-card-body">
+      <div className="item-card-top">
+        <div>
+          <h4 className="item-name">{draft.name || 'Untitled Draft'}</h4>
+          <span className="item-category">{draft.category || 'Uncategorized'}</span>
+        </div>
+        {draft.pricePerDay > 0 && (
+          <span className="item-price lender-stat">Rs. {draft.pricePerDay.toFixed(2)}/day</span>
+        )}
+      </div>
+      {draft.description && <p className="item-description">{draft.description}</p>}
+      <div className="item-meta">
+        {draft.pickupLocation && <span className="item-meta-chip">📍 {draft.pickupLocation}</span>}
+        {draft.minRentalDays > 0 && <span className="item-meta-chip">📅 {draft.minRentalDays}–{draft.maxRentalDays} days</span>}
+        <span className="item-meta-chip">✏️ Saved {new Date(draft.updatedAt).toLocaleDateString()}</span>
+      </div>
+      <div className="item-card-actions">
+        <button className="item-action-btn draft-edit-btn" onClick={onEdit}>✏️ Edit</button>
+        <button className="item-action-btn draft-publish-btn" onClick={onPublish}>🚀 Publish</button>
+        <button className="item-action-btn item-action-delete" onClick={onDelete}>🗑️</button>
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Overdue Booking Card ─────────────────────────────────────
+const OverdueCard = ({ booking, onMarkReturned, onCollectFine }) => {
+  const daysOverdue = Math.ceil((new Date() - new Date(booking.dueDate)) / (1000 * 60 * 60 * 24));
+
+  return (
+    <div className="overdue-card">
+      <div className="overdue-card-left">
+        {booking.item?.image ? (
+          <img src={`http://localhost:5000${booking.item.image}`} alt={booking.item.name} className="overdue-item-img" />
+        ) : (
+          <div className="overdue-item-img-placeholder">📦</div>
+        )}
+      </div>
+      <div className="overdue-card-body">
+        <div className="overdue-card-top">
+          <div>
+            <h4 className="overdue-item-name">{booking.item?.name}</h4>
+            <p className="overdue-borrower">
+              👤 {booking.borrower?.fullname} · 📧 {booking.borrower?.email} · 📱 {booking.borrower?.phonenumber}
+            </p>
+          </div>
+          <div className="overdue-fine-block">
+            <span className="overdue-days-badge">⏰ {daysOverdue} day{daysOverdue !== 1 ? 's' : ''} overdue</span>
+            <span className="overdue-fine-amount">Rs. {booking.fineAmount?.toFixed(2) || '0.00'} fine</span>
+          </div>
+        </div>
+        <div className="overdue-dates">
+          <span>📅 Due: <strong>{new Date(booking.dueDate).toLocaleDateString()}</strong></span>
+          <span>🔄 Rate: Rs. {booking.finePerDay}/day</span>
+          <span>🎓 {booking.borrower?.campusRegistrationNumber}</span>
+        </div>
+        <div className="overdue-actions">
+          <button className="overdue-btn returned-btn" onClick={onMarkReturned}>✅ Mark Returned</button>
+          {!booking.fineCollected && booking.fineAmount > 0 && (
+            <button className="overdue-btn fine-btn" onClick={onCollectFine}>💰 Collect Fine</button>
+          )}
+          {booking.fineCollected && <span className="fine-collected-badge">✅ Fine Collected</span>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Active Booking Card ──────────────────────────────────────
+const ActiveBookingCard = ({ booking }) => {
+  const daysLeft = Math.ceil((new Date(booking.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+
+  return (
+    <div className="overdue-card active-booking-card">
+      <div className="overdue-card-left">
+        {booking.item?.image ? (
+          <img src={`http://localhost:5000${booking.item.image}`} alt={booking.item.name} className="overdue-item-img" />
+        ) : (
+          <div className="overdue-item-img-placeholder">📦</div>
+        )}
+      </div>
+      <div className="overdue-card-body">
+        <div className="overdue-card-top">
+          <div>
+            <h4 className="overdue-item-name">{booking.item?.name}</h4>
+            <p className="overdue-borrower">👤 {booking.borrower?.fullname} · 📱 {booking.borrower?.phonenumber}</p>
+          </div>
+          <span className="active-days-badge">{daysLeft > 0 ? `⏳ ${daysLeft}d left` : '⚠️ Due today'}</span>
+        </div>
+        <div className="overdue-dates">
+          <span>📅 Due: <strong>{new Date(booking.dueDate).toLocaleDateString()}</strong></span>
+          <span>💰 Rs. {booking.totalCost?.toFixed(2)}</span>
         </div>
       </div>
     </div>

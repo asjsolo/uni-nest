@@ -47,6 +47,16 @@ const itemSchema = new mongoose.Schema(
             enum: ['Available', 'Out of Stock'],
             default: 'Available',
         },
+        status: {
+            type: String,
+            enum: ['published', 'draft'],
+            default: 'published',
+        },
+        finePerDay: {
+            type: Number,
+            default: 10,
+            min: [0, 'Fine per day cannot be negative'],
+        },
         minRentalDays: {
             type: Number,
             required: [true, 'Please add minimum rental days'],

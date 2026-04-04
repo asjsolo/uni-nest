@@ -2,6 +2,7 @@ import express from 'express';
 import {
     createItem,
     getMyItems,
+    getAllPublishedItems,
     getItemById,
     updateItem,
     deleteItem,
@@ -14,8 +15,11 @@ const router = express.Router();
 // All routes require authentication
 router.use(protect);
 
+// Public browse route (all authenticated users can browse published items)
+router.get('/items', getAllPublishedItems);
+
 // Lender-specific routes
-router.post('/items', authorizeRoles('lender'), upload.single('image'), createItem);
+router.post('/items/create', authorizeRoles('lender'), upload.single('image'), createItem);
 router.get('/my-items', authorizeRoles('lender'), getMyItems);
 
 // General routes
