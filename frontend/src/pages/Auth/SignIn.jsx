@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 
 const SignIn = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, currentUser } = useAuth();
 
     const [form, setForm] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
@@ -23,11 +23,7 @@ const SignIn = () => {
         try {
             const { data } = await axios.post('http://localhost:5000/api/auth/login', form);
             login(data);
-            if (data.role === 'Admin') {
-                navigate('/admin');
-            } else {
-                navigate('/');
-            }
+            navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please try again.');
         } finally {

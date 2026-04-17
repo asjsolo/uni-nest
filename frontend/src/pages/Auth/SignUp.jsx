@@ -33,7 +33,7 @@ const SignUp = () => {
                 password: form.password,
             });
             login(data);
-            navigate('/');
+            navigate('/dashboard');
         } catch (err) {
             setError(err.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
