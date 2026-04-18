@@ -1,44 +1,37 @@
 import mongoose from 'mongoose';
 
-const itemSchema = new mongoose.Schema(
-    {
-        title: {
-            type: String,
-            required: true,
-        },
-        description: {
-            type: String,
-            required: true,
-        },
-        category: {
-            type: String,
-            required: true,
-        },
-        pricing: {
-            depositAmount: {
-                type: Number,
-                required: true,
-            },
-            fullPrice: {
-                type: Number,
-                required: true,
-            },
-        },
-        status: {
-            type: String,
-            enum: ['Available', 'Rented', 'Deactivated'],
-            default: 'Available',
-        },
-        lender: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true,
-        },
-    },
-    {
-        timestamps: true,
-    }
-);
+const itemSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  condition: {
+    type: String,
+    required: true
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['available', 'borrowed'],
+    default: 'available'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
 
 const Item = mongoose.model('Item', itemSchema);
 export default Item;

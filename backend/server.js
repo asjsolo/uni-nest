@@ -1,33 +1,40 @@
 import express from 'express';
-import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import cors from 'cors';
-import connectDB from './config/db.js';
-import adminRoutes from './routes/adminRoutes.js';
+import dotenv from 'dotenv';
 
-// Load env variables
+// Load environment variables
 dotenv.config();
 
-// Connect to database
-connectDB();
-
+// Initialize the Express app
 const app = express();
 
 // Middleware
+// Enable CORS to allow requests from the frontend
 app.use(cors());
+// Parse incoming JSON requests
 app.use(express.json());
 
-// Routes Placeholders
-// app.use('/api/inventory', inventoryRoutes); // Member 1
-// app.use('/api/borrowing', borrowingRoutes); // Member 2
-// app.use('/api/analytics', analyticsRoutes); // Member 3
-app.use('/api/admin', adminRoutes);         // Member 4
-
+// Basic test route
 app.get('/', (req, res) => {
-  res.send('UNI NEST API is running...');
+  res.send('API is running...');
 });
 
+// Configure the PORT
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Connect to MongoDB and start the server
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('Successfully connected to MongoDB');
+
+    // Start the Express server once the database is connected
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err.message);
+    process.exit(1); // Exit process with failure
+  });
