@@ -1,0 +1,235 @@
+/* ─── Home Page ─── */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 48px;
+}
+
+.home-hero {
+  text-align: center;
+  max-width: 640px;
+}
+
+.home-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--primary-light);
+  margin-bottom: 24px;
+  letter-spacing: 0.02em;
+}
+
+.home-title {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.home-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-weight: 400;
+}
+
+/* ─── Role Cards ─── */
+.role-cards {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  max-width: 860px;
+}
+
+.role-card {
+  position: relative;
+  flex: 1;
+  padding: 40px 36px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.role-card:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.lender-card:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 20px 60px rgba(16, 185, 129, 0.15);
+}
+
+.borrower-card:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 20px 60px rgba(59, 130, 246, 0.15);
+}
+
+/* Glow blobs on cards */
+.role-card-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0;
+  top: -60px;
+  right: -60px;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.role-card:hover .role-card-glow { opacity: 1; }
+.lender-glow  { background: rgba(16, 185, 129, 0.35); }
+.borrower-glow { background: rgba(59, 130, 246, 0.35); }
+
+/* Icon */
+.role-icon {
+  font-size: 2.8rem;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 4px;
+}
+
+.role-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.role-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.role-perks {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.role-perks li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* CTA row */
+.role-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: white;
+  transition: filter 0.2s ease;
+  margin-top: auto;
+}
+
+.role-card:hover .role-cta { filter: brightness(1.1); }
+
+.lender-cta {
+  background: linear-gradient(135deg, var(--lender-color), var(--lender-dark));
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.borrower-cta {
+  background: linear-gradient(135deg, var(--borrower-color), var(--borrower-dark));
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.cta-arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.role-card:hover .cta-arrow { transform: translateX(4px); }
+
+/* Divider */
+.role-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-width: 48px;
+}
+
+.divider-line {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(to bottom, transparent, var(--border), transparent);
+}
+
+.home-footer {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 720px) {
+  .role-cards {
+    flex-direction: column;
+    max-width: 440px;
+  }
+
+  .role-divider {
+    flex-direction: row;
+    padding: 12px 0;
+  }
+
+  .divider-line {
+    width: auto;
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+}

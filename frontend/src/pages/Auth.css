@@ -1,0 +1,311 @@
+/* ─── Auth Layout (Login + Register) ─── */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+}
+
+/* ─── Left Decorative Panel ─── */
+.auth-panel {
+  position: relative;
+  width: 42%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.lender-panel {
+  background: linear-gradient(160deg, #052218 0%, #064e3b 50%, #065f46 100%);
+}
+
+.borrower-panel {
+  background: linear-gradient(160deg, #030d2c 0%, #1e3a8a 50%, #1d4ed8 100%);
+}
+
+.panel-blob {
+  position: absolute;
+  inset: -50%;
+  border-radius: 50%;
+  opacity: 0.25;
+  background: radial-gradient(circle, white 0%, transparent 60%);
+  animation: floatBlob 12s ease-in-out infinite alternate;
+}
+
+.panel-content {
+  position: relative;
+  padding: 60px 48px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.panel-icon {
+  font-size: 3rem;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.panel-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.panel-desc {
+  font-size: 1rem;
+  line-height: 1.7;
+  opacity: 0.8;
+}
+
+/* Panel feature list */
+.panel-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.panel-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.92rem;
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.feature-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+/* Panel steps */
+.panel-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.92rem;
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.step-num {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ─── Form Container ─── */
+.auth-form-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header row inside card */
+.auth-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.back-link {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+.back-link:hover { color: var(--text-secondary); }
+
+.role-badge {
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.lender-badge {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.borrower-badge {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+}
+
+/* Titles */
+.auth-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.auth-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: -12px 0 0;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Auth buttons */
+.btn-auth {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-auth:hover { transform: translateY(-2px); }
+.btn-auth:active { transform: translateY(0); }
+.btn-auth:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+.btn-lender {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+}
+.btn-lender:not(:disabled):hover {
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+}
+
+.btn-borrower {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35);
+}
+.btn-borrower:not(:disabled):hover {
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+}
+
+/* Spinner */
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.auth-switch {
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .auth-page { flex-direction: column; }
+  .auth-panel {
+    width: 100%;
+    min-height: auto;
+    padding: 0;
+  }
+  .panel-content { padding: 36px 28px; }
+  .panel-title { font-size: 1.5rem; }
+  .panel-desc, .panel-features, .panel-steps { display: none; }
+  .panel-icon { width: 60px; height: 60px; font-size: 2rem; }
+  .auth-card { padding: 28px 24px; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+/* ─── Form Validation Styles ─── */
+.input-valid {
+  border-color: #34d399 !important;
+  border-width: 1.5px;
+  background: rgba(52, 211, 153, 0.08) !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15) !important;
+}
+
+.input-valid:focus {
+  border-color: #10b981 !important;
+  background: rgba(52, 211, 153, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.25) !important;
+}
+
+.input-invalid {
+  border-color: #f87171 !important;
+  border-width: 1.5px;
+  background: rgba(248, 113, 113, 0.08) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15) !important;
+}
+
+.input-invalid:focus {
+  border-color: #ef4444 !important;
+  background: rgba(248, 113, 113, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.25) !important;
+}
