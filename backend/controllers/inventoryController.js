@@ -33,7 +33,7 @@ export const createItem = async (req, res) => {
         }
 
         const item = await Item.create({
-            lender: req.user._id,
+            owner: req.user._id,
             name: name || 'Untitled Draft',
             category: category || 'Other',
             description: description || '',
@@ -62,7 +62,7 @@ export const getMyItems = async (req, res) => {
     try {
         const { search, category, minPrice, maxPrice, availability, status } = req.query;
 
-        const query = { lender: req.user._id };
+        const query = { owner: req.user._id };
 
         // Filter by status (draft/published/all)
         if (status && status !== 'all') {
@@ -119,7 +119,7 @@ export const getAllPublishedItems = async (req, res) => {
         }
 
         const items = await Item.find(query)
-            .populate('lender', 'fullname email phonenumber')
+            .populate('owner', 'fullname email phonenumber')
             .sort({ createdAt: -1 });
 
         res.status(200).json(items);
@@ -133,7 +133,7 @@ export const getAllPublishedItems = async (req, res) => {
 // @access  Private
 export const getItemById = async (req, res) => {
     try {
-        const item = await Item.findById(req.params.id).populate('lender', 'fullname email');
+        const item = await Item.findById(req.params.id).populate('owner', 'fullname email');
 
         if (!item) {
             return res.status(404).json({ message: 'Item not found' });
@@ -157,7 +157,7 @@ export const updateItem = async (req, res) => {
         }
 
         // Ensure the lender owns the item
-        if (item.lender.toString() !== req.user._id.toString()) {
+        if (item.owner.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized to update this item' });
         }
 
@@ -209,13 +209,37 @@ export const deleteItem = async (req, res) => {
             return res.status(404).json({ message: 'Item not found' });
         }
 
-        if (item.lender.toString() !== req.user._id.toString()) {
+        if (item.owner.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized to delete this item' });
         }
 
         await item.deleteOne();
 
         res.status(200).json({ message: 'Item removed successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message || 'Server Error' });
+    }
+};
+
+// @desc    Deactivate an item (set to draft)
+// @route   PUT /api/inventory/items/:id/deactivate
+// @access  Private (Lender only - owner)
+export const deactivateItem = async (req, res) => {
+    try {
+        const item = await Item.findById(req.params.id);
+
+        if (!item) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        if (item.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized to deactivate this item' });
+        }
+
+        item.status = 'draft';
+        await item.save();
+
+        res.status(200).json(item);
     } catch (error) {
         res.status(500).json({ message: error.message || 'Server Error' });
     }

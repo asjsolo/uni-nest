@@ -4,81 +4,52 @@ import './Home.css';
 const Home = () => {
   const navigate = useNavigate();
 
-  const handleRoleSelection = (role) => {
-    navigate('/login', { state: { role } });
-  };
-
   return (
     <>
       <div className="page-bg" />
 
-      <div className="home-container">
+      <div className="home-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
         {/* Hero Section */}
-        <div className="home-hero fade-up">
-          <div className="home-badge">🏠 Campus Housing Platform</div>
+        <div className="home-hero fade-up" style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <div className="home-badge" style={{ margin: '0 auto 20px' }}>🏠 Campus Housing Platform</div>
           <h1 className="home-title">
             Welcome to <span className="gradient-text">UniNest</span>
           </h1>
-          <p className="home-subtitle">
-            The smart way to lend and borrow items within your campus community.
-            Connect, share, and thrive together.
+          <p className="home-subtitle" style={{ maxWidth: '600px', margin: '0 auto' }}>
+            The smartest way to lend and borrow items within your campus community.
+            Connect, share, and thrive together with a unified student account.
           </p>
         </div>
 
-        {/* Role Cards */}
-        <div className="role-cards fade-up" style={{ animationDelay: '0.15s' }}>
-          {/* Lender Card */}
-          <div className="role-card lender-card" onClick={() => handleRoleSelection('lender')}>
-            <div className="role-card-glow lender-glow" />
-            <div className="role-icon lender-icon">🏷️</div>
-            <h2 className="role-title">I'm a Lender</h2>
-            <p className="role-desc">
-              List your items for fellow students to borrow. Earn trust, build connections
-              , and help your campus community.
-            </p>
-            <ul className="role-perks">
-              <li>✦ List unlimited items</li>
-              <li>✦ Manage borrowing requests</li>
-              <li>✦ Build your campus reputation</li>
-            </ul>
-            <div className="role-cta lender-cta">
-              Get Started as Lender
-              <span className="cta-arrow">→</span>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="role-divider">
-            <div className="divider-line" />
-            <span>or</span>
-            <div className="divider-line" />
-          </div>
-
-          {/* Borrower Card */}
-          <div className="role-card borrower-card" onClick={() => handleRoleSelection('borrower')}>
-            <div className="role-card-glow borrower-glow" />
-            <div className="role-icon borrower-icon">🎒</div>
-            <h2 className="role-title">I'm a Borrower</h2>
-            <p className="role-desc">
-              Find and borrow items from trusted students on campus. Save money and
-              access what you need instantly.
-            </p>
-            <ul className="role-perks">
-              <li>✦ Browse available items</li>
-              <li>✦ Request with one click</li>
-              <li>✦ Track your borrowing history</li>
-            </ul>
-            <div className="role-cta borrower-cta">
-              Get Started as Borrower
-              <span className="cta-arrow">→</span>
-            </div>
-          </div>
+        {/* Unified Auth Actions */}
+        <div className="fade-up" style={{ animationDelay: '0.15s', display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <button 
+            onClick={() => navigate('/login')}
+            className="btn-auth btn-primary"
+            style={{ padding: '15px 40px', fontSize: '1.1rem', minWidth: '180px', borderRadius: '99px' }}
+          >
+            Login
+          </button>
+          
+          <button 
+            onClick={() => navigate('/register')}
+            className="btn-auth"
+            style={{ 
+              padding: '15px 40px', 
+              fontSize: '1.1rem', 
+              minWidth: '180px', 
+              background: 'rgba(255,255,255,0.1)', 
+              color: '#fff', 
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '99px',
+              transition: 'background 0.2s ease'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          >
+            Register
+          </button>
         </div>
-
-        <p className="home-footer fade-up" style={{ animationDelay: '0.3s' }}>
-          Already have an account?{' '}
-          <a href="/login">Sign in here</a>
-        </p>
       </div>
     </>
   );

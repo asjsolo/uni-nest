@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
@@ -6,16 +6,56 @@ import './Dashboard.css';
 const BorrowerDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchRequests = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/my-requests`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) setRequests(data);
+    } catch (err) {
+      console.error('Error fetching requests', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const handleReturnItem = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingId}/return`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to return item');
+      fetchRequests();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to return item');
+    }
+  };
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
+  const activeRequests = requests.filter(r => r.status === 'active' || r.status === 'pending');
+  const itemsReturned = requests.filter(r => r.status === 'returned').length;
+
   const stats = [
-    { label: 'Items Borrowed', value: '0', icon: '🎒' },
-    { label: 'Active Requests', value: '0', icon: '🔄' },
-    { label: 'Items Returned', value: '0', icon: '✅' },
+    { label: 'Items Borrowed', value: requests.length.toString(), icon: '🎒' },
+    { label: 'Active Requests', value: activeRequests.length.toString(), icon: '🔄' },
+    { label: 'Items Returned', value: itemsReturned.toString(), icon: '✅' },
     { label: 'Rating', value: '—', icon: '⭐' },
   ];
 
@@ -41,14 +81,15 @@ const BorrowerDashboard = () => {
           </div>
 
           <nav className="sidebar-nav">
-            <a href="#" className="nav-item active">
+            <a href="#" className={`nav-item ${activeTab === 'Dashboard' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('Dashboard'); }}>
               <span className="nav-icon">📊</span> Dashboard
             </a>
-            <a href="#" className="nav-item">
+            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); navigate('/browse-items'); }}>
               <span className="nav-icon">🔍</span> Browse Items
             </a>
-            <a href="#" className="nav-item">
+            <a href="#" className={`nav-item ${activeTab === 'My Requests' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('My Requests'); }}>
               <span className="nav-icon">📋</span> My Requests
+              {requests.length > 0 && <span className="nav-badge" style={{ marginLeft: 'auto', background: 'var(--primary-color)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>{requests.length}</span>}
             </a>
             <a href="#" className="nav-item">
               <span className="nav-icon">💬</span> Messages
@@ -58,81 +99,149 @@ const BorrowerDashboard = () => {
             </a>
           </nav>
 
-          <button className="sidebar-logout" onClick={handleLogout}>
-            <span>🚪</span> Sign Out
-          </button>
+          <div className="sidebar-bottom-actions">
+            <button className="sidebar-switch-role" onClick={() => navigate('/dashboard')} style={{ width: '100%', marginBottom: '10px', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span>🔄</span> Back to Main Hub
+            </button>
+            <button className="sidebar-logout" onClick={handleLogout} style={{ width: '100%' }}>
+              <span>🚪</span> Sign Out
+            </button>
+          </div>
         </aside>
 
         {/* Main content */}
         <main className="dashboard-main">
-          {/* Header */}
-          <div className="dashboard-header fade-up">
-            <div>
-              <h1 className="dashboard-greeting">
-                Welcome back, <span className="borrower-highlight">{user?.fullname?.split(' ')[0]}</span> 👋
-              </h1>
-              <p className="dashboard-date">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              </p>
-            </div>
-            <button className="browse-btn">🔍 Browse Items</button>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="stats-grid fade-up" style={{ animationDelay: '0.1s' }}>
-            {stats.map((stat) => (
-              <div key={stat.label} className="stat-card glass-card">
-                <div className="stat-icon">{stat.icon}</div>
+          {activeTab === 'Dashboard' ? (
+            <>
+              {/* Header */}
+              <div className="dashboard-header fade-up">
                 <div>
-                  <div className="stat-value borrower-stat">{stat.value}</div>
-                  <div className="stat-label">{stat.label}</div>
+                  <h1 className="dashboard-greeting">
+                    Welcome back, <span className="borrower-highlight">{user?.fullname?.split(' ')[0]}</span> 👋
+                  </h1>
+                  <p className="dashboard-date">
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  </p>
                 </div>
+                <button className="browse-btn" onClick={() => navigate('/browse-items')}>🔍 Browse Items</button>
               </div>
-            ))}
-          </div>
 
-          {/* Profile Details */}
-          <div className="content-grid fade-up" style={{ animationDelay: '0.2s' }}>
-            <div className="glass-card info-card">
-              <h3 className="card-heading">Account Details</h3>
-              <div className="info-list">
-                <div className="info-row">
-                  <span className="info-label">📧 Email</span>
-                  <span className="info-val">{user?.email}</span>
+              {/* Stats Grid */}
+              <div className="stats-grid fade-up" style={{ animationDelay: '0.1s' }}>
+                {stats.map((stat) => (
+                  <div key={stat.label} className="stat-card glass-card">
+                    <div className="stat-icon">{stat.icon}</div>
+                    <div>
+                      <div className="stat-value borrower-stat">{stat.value}</div>
+                      <div className="stat-label">{stat.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Profile Details */}
+              <div className="content-grid fade-up" style={{ animationDelay: '0.2s' }}>
+                <div className="glass-card info-card">
+                  <h3 className="card-heading">Account Details</h3>
+                  <div className="info-list">
+                    <div className="info-row">
+                      <span className="info-label">📧 Email</span>
+                      <span className="info-val">{user?.email}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">📱 Phone</span>
+                      <span className="info-val">{user?.phonenumber}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">🎓 Reg. No.</span>
+                      <span className="info-val">{user?.campusRegistrationNumber}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">🎭 Role</span>
+                      <span className="info-val borrower-highlight" style={{ textTransform: 'capitalize' }}>{user?.role}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="info-row">
-                  <span className="info-label">📱 Phone</span>
-                  <span className="info-val">{user?.phonenumber}</span>
-                </div>
-                <div className="info-row">
-                  <span className="info-label">🎓 Reg. No.</span>
-                  <span className="info-val">{user?.campusRegistrationNumber}</span>
-                </div>
-                <div className="info-row">
-                  <span className="info-label">🎭 Role</span>
-                  <span className="info-val borrower-highlight" style={{ textTransform: 'capitalize' }}>{user?.role}</span>
+
+                <div className="glass-card info-card">
+                  <h3 className="card-heading">Quick Actions</h3>
+                  <div className="quick-actions borrower-actions">
+                    <button className="action-btn" onClick={() => navigate('/browse-items')}>🔍 Browse All Items</button>
+                    <button className="action-btn" onClick={() => setActiveTab('My Requests')}>📋 View My Requests</button>
+                    <button className="action-btn">💬 Open Messages</button>
+                    <button className="action-btn">📜 Borrowing History</button>
+                  </div>
                 </div>
               </div>
+
+              {/* Empty state */}
+              {requests.length === 0 && (
+                <div className="glass-card empty-state fade-up" style={{ animationDelay: '0.3s' }}>
+                  <div className="empty-icon">🔍</div>
+                  <h3>No active borrows yet</h3>
+                  <p>Browse available items from lenders on your campus and make a request.</p>
+                  <button className="btn-empty borrower-btn-empty" onClick={() => navigate('/browse-items')}>Browse Available Items</button>
+                </div>
+              )}
+            </>
+          ) : activeTab === 'My Requests' ? (
+            <div className="glass-card listings-section fade-up">
+              <div className="listings-header">
+                <h3 className="card-heading" style={{ borderBottom: 'none', paddingBottom: 0 }}>📋 My Requests</h3>
+                <span className="listings-count">{requests.length} requests</span>
+              </div>
+              
+              {loading ? (
+                <div className="listings-loading"><div className="loading-spinner" /><p>Loading requests…</p></div>
+              ) : requests.length === 0 ? (
+                <div className="empty-state" style={{ boxShadow: 'none', border: 'none', background: 'transparent' }}>
+                  <div className="empty-icon">📋</div>
+                  <h3>No requests found</h3>
+                  <p>You haven't made any rental requests yet.</p>
+                  <button className="btn-empty borrower-btn-empty" onClick={() => navigate('/browse-items')}>Browse Items</button>
+                </div>
+              ) : (
+                <div className="items-grid" style={{ marginTop: '20px' }}>
+                  {requests.map(req => (
+                    <div key={req._id} className="item-card glass-card">
+                      <div className="item-card-image">
+                        {req.item?.image ? (
+                          <img src={`http://localhost:5000/${req.item.image.replace(/^[\\/]+/, '')}`} alt={req.item.name} className="item-img" />
+                        ) : (
+                          <div className="item-img-placeholder">📦</div>
+                        )}
+                        <div className={`item-status-badge ${req.status === 'pending' ? 'badge-out' : 'badge-available'}`} style={{ textTransform: 'capitalize' }}>
+                          {req.status}
+                        </div>
+                      </div>
+                      <div className="item-card-body">
+                        <div className="item-card-top">
+                          <div>
+                            <h4 className="item-name">{req.item?.name}</h4>
+                            <span className="item-category">From: {req.lender?.fullname}</span>
+                          </div>
+                        </div>
+                        <div className="item-meta" style={{ marginTop: '10px' }}>
+                          <span className="item-meta-chip">📅 Requested: {new Date(req.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        {req.status === 'active' && (
+                          <div className="item-card-actions" style={{ marginTop: '16px' }}>
+                            <button 
+                              className="action-btn" 
+                              style={{ width: '100%', background: 'var(--primary-color)', color: 'white', textAlign: 'center', border: 'none', fontWeight: 'bold' }}
+                              onClick={() => handleReturnItem(req._id)}
+                            >
+                              🔄 Return Item
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-
-            <div className="glass-card info-card">
-              <h3 className="card-heading">Quick Actions</h3>
-              <div className="quick-actions borrower-actions">
-                <button className="action-btn">🔍 Browse All Items</button>
-                <button className="action-btn">📋 View My Requests</button>
-                <button className="action-btn">💬 Open Messages</button>
-                <button className="action-btn">📜 Borrowing History</button>
-              </div>
-            </div>
-          </div>
-
-          {/* Empty state */}
-          <div className="glass-card empty-state fade-up" style={{ animationDelay: '0.3s' }}>
-            <div className="empty-icon">🔍</div>
-            <h3>No active borrows yet</h3>
-            <p>Browse available items from lenders on your campus and make a request.</p>
-            <button className="btn-empty borrower-btn-empty">Browse Available Items</button>
-          </div>
+          ) : null}
         </main>
       </div>
     </>

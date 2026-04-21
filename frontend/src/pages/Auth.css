@@ -26,6 +26,10 @@
   background: linear-gradient(160deg, #030d2c 0%, #1e3a8a 50%, #1d4ed8 100%);
 }
 
+.student-panel {
+  background: linear-gradient(160deg, #281C59 0%, #4E8D9C 50%, #281C59 100%);
+}
+
 .panel-blob {
   position: absolute;
   inset: -50%;

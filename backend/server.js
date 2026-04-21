@@ -2,7 +2,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import userRoutes from './routes/userRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
+import bookingRoutes from './routes/bookingRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -16,13 +23,22 @@ app.use(cors());
 // Parse incoming JSON requests
 app.use(express.json());
 
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Basic test route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
 // User routes mapping
-app.use('/api/users', userRoutes);
+app.use('/api/auth', userRoutes);
+
+// Scaffolded module routes mapping
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/bookings', bookingRoutes);
+import adminRoutes from './routes/adminRoutes.js';
+app.use('/api/admin', adminRoutes);
 
 // Configure the PORT
 const PORT = process.env.PORT || 5000;

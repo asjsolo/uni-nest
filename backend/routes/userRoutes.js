@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -16,10 +17,10 @@ const generateToken = (id) => {
 // @desc    Register a new user
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { fullname, email, phonenumber, password, campusRegistrationNumber } = req.body;
 
     // Validate inputs
-    if (!name || !email || !password) {
+    if (!fullname || !email || !password || !phonenumber || !campusRegistrationNumber) {
       return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
@@ -35,7 +36,7 @@ router.post('/register', async (req, res) => {
 
     // Create new user in the database
     const user = await User.create({
-      name,
+      name: fullname,
       email,
       password: hashedPassword,
     });
@@ -77,6 +78,22 @@ router.post('/login', async (req, res) => {
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/users/profile
+// @desc    Get user profile
+router.get('/profile', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
     console.error(error);

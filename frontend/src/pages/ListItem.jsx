@@ -44,7 +44,7 @@ const ListItem = () => {
 
   const [errors, setErrors] = useState({});
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(editingData?.image ? `http://localhost:5000${editingData.image}` : null);
+  const [imagePreview, setImagePreview] = useState(editingData?.image ? `http://localhost:5000/${editingData.image.replace(/^[\\/]+/, '')}` : null);
   const [imageError, setImageError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -261,9 +261,14 @@ const ListItem = () => {
             </a>
           </nav>
 
-          <button className="sidebar-logout" onClick={() => navigate('/lender-dashboard')}>
-            <span>←</span> Back to Dashboard
-          </button>
+          <div className="sidebar-bottom-actions">
+            <button className="sidebar-switch-role" onClick={() => navigate('/dashboard')} style={{ width: '100%', marginBottom: '10px', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span>🔄</span> Back to Main Hub
+            </button>
+            <button className="sidebar-logout" onClick={() => navigate('/lender-dashboard')} style={{ width: '100%' }}>
+              <span>←</span> Back to Dashboard
+            </button>
+          </div>
         </aside>
 
         {/* Main Content */}

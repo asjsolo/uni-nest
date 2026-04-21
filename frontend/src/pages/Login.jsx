@@ -1,15 +1,11 @@
 import { useState, useContext } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import './Auth.css';
 
 const Login = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-
-  const selectedRole = location.state?.role || 'borrower';
-  const isLender = selectedRole === 'lender';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,9 +17,12 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      const user = await login(email, password);
-      if (user.role === 'lender') navigate('/lender-dashboard');
-      else navigate('/borrower-dashboard');
+      const userData = await login(email, password);
+      if (userData.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard'); // Route directly to Main Hub
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password.');
     } finally {
@@ -36,22 +35,23 @@ const Login = () => {
       <div className="page-bg" />
       <div className="auth-page">
         {/* Left panel */}
-        <div className={`auth-panel ${isLender ? 'lender-panel' : 'borrower-panel'}`}>
+        <div className="auth-panel student-panel">
           <div className="panel-blob" />
           <div className="panel-content">
-            <div className="panel-icon">{isLender ? '🏷️' : '🎒'}</div>
-            <h2 className="panel-title">{isLender ? 'Lender' : 'Borrower'} Portal</h2>
+            <div className="panel-icon">🎓</div>
+            <h2 className="panel-title">Student Portal</h2>
             <p className="panel-desc">
-              {isLender
-                ? 'Manage your listings, track requests, and build your campus reputation.'
-                : 'Browse available items, make requests, and manage your borrowing history.'}
+              Your central hub to list items for lending, browse campus items, and manage your rentals securely.
             </p>
             <div className="panel-features">
-              {['List & manage items', 'View borrowing requests', 'Campus reputation score'].map((f, i) => (
+              {[
+                'Single account for lending & borrowing',
+                'Trust-verified campus users',
+                'Reputation scoring system'
+              ].map((f, i) => (
                 <div key={i} className="panel-feature-item">
                   <span className="feature-dot" />
-                  {isLender ? ['List & manage items', 'View borrowing requests', 'Campus reputation score'][i]
-                    : ['Browse item catalogue', 'One-click borrow requests', 'Track borrowing history'][i]}
+                  {f}
                 </div>
               ))}
             </div>
@@ -63,13 +63,13 @@ const Login = () => {
           <div className="auth-card glass-card fade-up">
             <div className="auth-card-header">
               <a href="/" className="back-link">← Back</a>
-              <div className={`role-badge ${isLender ? 'lender-badge' : 'borrower-badge'}`}>
-                {isLender ? '🏷️ Lender' : '🎒 Borrower'}
+              <div className="role-badge" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}>
+                ⭐ Unified Account
               </div>
             </div>
 
             <h1 className="auth-title">Welcome back</h1>
-            <p className="auth-subtitle">Sign in to your {selectedRole} account</p>
+            <p className="auth-subtitle">Sign in to your UniNest account</p>
 
             {error && (
               <div className="alert-error">
@@ -107,7 +107,7 @@ const Login = () => {
 
               <button
                 type="submit"
-                className={`btn-auth ${isLender ? 'btn-lender' : 'btn-borrower'}`}
+                className="btn-auth btn-primary"
                 disabled={loading}
               >
                 {loading ? <span className="btn-spinner" /> : null}
@@ -117,7 +117,7 @@ const Login = () => {
 
             <p className="auth-switch">
               Don't have an account?{' '}
-              <Link to="/register" state={{ role: selectedRole }}>Create one here</Link>
+              <Link to="/register">Create one here</Link>
             </p>
 
             <p className="auth-switch">

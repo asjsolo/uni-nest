@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const itemSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
     required: true
   },
@@ -13,9 +13,41 @@ const itemSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  condition: {
+  pricePerDay: {
+    type: Number,
+    default: 0
+  },
+  discountPercentage: {
+    type: Number,
+    default: 0
+  },
+  quantity: {
+    type: Number,
+    default: 1
+  },
+  availabilityStatus: {
     type: String,
-    required: true
+    default: 'Available'
+  },
+  minRentalDays: {
+    type: Number,
+    default: 1
+  },
+  maxRentalDays: {
+    type: Number,
+    default: 1
+  },
+  pickupLocation: {
+    type: String,
+    default: ''
+  },
+  finePerDay: {
+    type: Number,
+    default: 10
+  },
+  image: {
+    type: String,
+    default: null
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -24,8 +56,7 @@ const itemSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['available', 'borrowed'],
-    default: 'available'
+    default: 'published'
   },
   createdAt: {
     type: Date,

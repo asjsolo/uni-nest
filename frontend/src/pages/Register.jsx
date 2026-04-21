@@ -1,15 +1,11 @@
 import { useState, useContext } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import './Auth.css';
 
 const Register = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { register } = useContext(AuthContext);
-
-  const selectedRole = location.state?.role || 'borrower';
-  const isLender = selectedRole === 'lender';
 
   const [formData, setFormData] = useState({
     fullname: '',
@@ -105,9 +101,8 @@ const Register = () => {
 
     setLoading(true);
     try {
-      const user = await register({ ...formData, role: selectedRole });
-      if (user.role === 'lender') navigate('/lender-dashboard');
-      else navigate('/borrower-dashboard');
+      await register({ ...formData });
+      navigate('/dashboard'); // Route directly to Main Hub
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
@@ -120,28 +115,26 @@ const Register = () => {
       <div className="page-bg" />
       <div className="auth-page">
         {/* Left panel */}
-        <div className={`auth-panel ${isLender ? 'lender-panel' : 'borrower-panel'}`}>
+        <div className="auth-panel student-panel">
           <div className="panel-blob" />
           <div className="panel-content">
-            <div className="panel-icon">{isLender ? '🏷️' : '🎒'}</div>
-            <h2 className="panel-title">Join as {isLender ? 'Lender' : 'Borrower'}</h2>
+            <div className="panel-icon">🎓</div>
+            <h2 className="panel-title">Join UniNest</h2>
             <p className="panel-desc">
-              {isLender
-                ? 'Start lending your items to campus students and build your reputation.'
-                : 'Access a wide range of items from fellow students on campus.'}
+              Create a single, unified student profile to both lend entirely free of charge and securely browse items across campus.
             </p>
             <div className="panel-steps">
               <div className="step-item">
                 <div className="step-num">1</div>
-                <span>Create your account</span>
+                <span>Register securely with your SLIIT details</span>
               </div>
               <div className="step-item">
                 <div className="step-num">2</div>
-                <span>Complete your profile</span>
+                <span>Enter your Central Dashboard</span>
               </div>
               <div className="step-item">
                 <div className="step-num">3</div>
-                <span>{isLender ? 'Start listing items' : 'Browse & borrow items'}</span>
+                <span>Borrow & Lend instantaneously</span>
               </div>
             </div>
           </div>
@@ -152,13 +145,13 @@ const Register = () => {
           <div className="auth-card glass-card fade-up">
             <div className="auth-card-header">
               <a href="/" className="back-link">← Back</a>
-              <div className={`role-badge ${isLender ? 'lender-badge' : 'borrower-badge'}`}>
-                {isLender ? '🏷️ Lender' : '🎒 Borrower'}
+              <div className="role-badge" style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}>
+                ⭐ Unified Account
               </div>
             </div>
 
             <h1 className="auth-title">Create account</h1>
-            <p className="auth-subtitle">Join UniNest as a {selectedRole} today</p>
+            <p className="auth-subtitle">Join UniNest today</p>
 
             {error && (
               <div className="alert-error">
@@ -217,7 +210,7 @@ const Register = () => {
                   autoComplete="email"
                 />
                 <small style={{ color: '#666', display: 'block', marginTop: '4px' }}>
-                  (e.g., IT12345678@sliit.com)
+                  (e.g., IT12345678@my.sliit.lk)
                 </small>
               </div>
 
@@ -259,7 +252,7 @@ const Register = () => {
 
               <button
                 type="submit"
-                className={`btn-auth ${isLender ? 'btn-lender' : 'btn-borrower'}`}
+                className="btn-auth btn-primary"
                 disabled={loading}
               >
                 {loading ? <span className="btn-spinner" /> : null}
@@ -269,7 +262,7 @@ const Register = () => {
 
             <p className="auth-switch">
               Already have an account?{' '}
-              <Link to="/login" state={{ role: selectedRole }}>Sign in here</Link>
+              <Link to="/login">Sign in here</Link>
             </p>
           </div>
         </div>

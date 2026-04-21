@@ -9,6 +9,8 @@ import BorrowerDashboard from './pages/BorrowerDashboard';
 import ListItem from './pages/ListItem';
 import BrowseItems from './pages/BrowseItems';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import MainDashboard from './pages/MainDashboard';
+import ItemDetail from './pages/ItemDetail';
 import './App.css';
 
 const PrivateRoute = ({ children, allowedRole }) => {
@@ -36,13 +38,30 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
+          {/* Main Central Hub for Students */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <PrivateRoute>
+                <MainDashboard />
+              </PrivateRoute>
+            } 
+          />
+          
           {/* Admin Dashboard */}
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route 
+            path="/admin" 
+            element={
+              <PrivateRoute allowedRole="admin">
+                <AdminDashboard />
+              </PrivateRoute>
+            } 
+          />
 
           <Route
             path="/lender-dashboard"
             element={
-              <PrivateRoute allowedRole="lender">
+              <PrivateRoute>
                 <LenderDashboard />
               </PrivateRoute>
             }
@@ -51,7 +70,7 @@ function App() {
           <Route
             path="/list-item"
             element={
-              <PrivateRoute allowedRole="lender">
+              <PrivateRoute>
                 <ListItem />
               </PrivateRoute>
             }
@@ -60,7 +79,7 @@ function App() {
           <Route
             path="/borrower-dashboard"
             element={
-              <PrivateRoute allowedRole="borrower">
+              <PrivateRoute>
                 <BorrowerDashboard />
               </PrivateRoute>
             }
@@ -69,8 +88,17 @@ function App() {
           <Route
             path="/browse-items"
             element={
-              <PrivateRoute allowedRole="borrower">
+              <PrivateRoute>
                 <BrowseItems />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/item/:id"
+            element={
+              <PrivateRoute>
+                <ItemDetail />
               </PrivateRoute>
             }
           />
@@ -81,4 +109,3 @@ function App() {
 }
 
 export default App;
-

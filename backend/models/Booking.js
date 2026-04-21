@@ -19,11 +19,12 @@ const bookingSchema = new mongoose.Schema(
         },
         startDate: {
             type: Date,
-            required: true,
+        },
+        endDate: {
+            type: Date,
         },
         dueDate: {
             type: Date,
-            required: true,
         },
         returnedDate: {
             type: Date,
@@ -31,16 +32,16 @@ const bookingSchema = new mongoose.Schema(
         },
         totalDays: {
             type: Number,
-            required: true,
+            default: 0,
         },
         totalCost: {
             type: Number,
-            required: true,
+            default: 0,
         },
         status: {
             type: String,
-            enum: ['active', 'returned', 'overdue'],
-            default: 'active',
+            enum: ['pending', 'approved', 'rejected', 'active', 'completed', 'returned', 'overdue'],
+            default: 'pending',
         },
         finePerDay: {
             type: Number,

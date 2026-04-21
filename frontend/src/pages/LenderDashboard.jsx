@@ -6,14 +6,14 @@ import './LenderDashboard.css';
 
 const CATEGORIES = ['All', 'Electronics', 'Books', 'Tools', 'Clothing', 'Sports', 'Furniture', 'Kitchen', 'Other'];
 const AVAILABILITY_OPTIONS = ['All', 'Available', 'Out of Stock'];
-const TABS = ['My Listings', 'Drafts', 'Overdue Rentals'];
+const TABS = ['My Listings', 'Drafts', 'Requests', 'Active Rentals', 'Overdue Rentals'];
 
 const LenderDashboard = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState('My Listings');
+  const [activeTab, setActiveTab] = useState('Dashboard');
   const [items, setItems] = useState([]);
   const [drafts, setDrafts] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -120,6 +120,25 @@ const LenderDashboard = () => {
     }
   };
 
+  const handleDeactivateItem = async (itemId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/inventory/items/${itemId}/deactivate`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      // Remove from published items list
+      setItems((prev) => prev.filter((i) => i._id !== itemId));
+      // Optionally re-fetch drafts so it appears there
+      fetchDrafts();
+      setSuccessMsg('Item deactivated and moved to drafts.');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setFetchError(err.message || 'Failed to deactivate item.');
+    }
+  };
+
   const handlePublishDraft = async (draft) => {
     // Prevent quick publish if draft has placeholder defaults
     if (draft.name === 'Untitled Draft' || draft.pricePerDay === 0 || !draft.description) {
@@ -178,8 +197,58 @@ const LenderDashboard = () => {
     }
   };
 
+  const handleApprove = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingId}/approve`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      setSuccessMsg('✅ Request approved!');
+      fetchBookings();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setFetchError(err.message || 'Failed to approve request.');
+    }
+  };
+
+  const handleReject = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to reject this request?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingId}/reject`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      setSuccessMsg('❌ Request rejected.');
+      fetchBookings();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setFetchError(err.message || 'Failed to reject request.');
+    }
+  };
+
+  const handleConfirmReturn = async (bookingId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingId}/confirm-return`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
+      setSuccessMsg('✅ Return confirmed!');
+      fetchBookings();
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err) {
+      setFetchError(err.message || 'Failed to confirm return.');
+    }
+  };
+
   const overdueBookings = bookings.filter((b) => b.status === 'overdue');
-  const activeBookings = bookings.filter((b) => b.status === 'active');
+  const activeBookings = bookings.filter((b) => b.status === 'active' || b.status === 'returned');
+  const pendingRequests = bookings.filter((b) => b.status === 'pending');
 
   const stats = [
     { label: 'Items Listed', value: items.length.toString(), icon: '📦' },
@@ -213,13 +282,22 @@ const LenderDashboard = () => {
           </div>
 
           <nav className="sidebar-nav">
-            <a href="#" className="nav-item active"><span className="nav-icon">📊</span> Dashboard</a>
-            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); setActiveTab('My Listings'); }}><span className="nav-icon">📦</span> My Listings</a>
-            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); setActiveTab('Drafts'); }}><span className="nav-icon">📝</span> Drafts {drafts.length > 0 && <span className="nav-badge">{drafts.length}</span>}</a>
-            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); setActiveTab('Overdue Rentals'); }}><span className="nav-icon">⚠️</span> Overdue {overdueBookings.length > 0 && <span className="nav-badge overdue-badge">{overdueBookings.length}</span>}</a>
+            <a href="#" className={`nav-item ${activeTab === 'Dashboard' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('Dashboard'); }}><span className="nav-icon">📊</span> Dashboard</a>
+            <a href="#" className={`nav-item ${activeTab === 'My Listings' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('My Listings'); }}><span className="nav-icon">📦</span> My Listings</a>
+            <a href="#" className={`nav-item ${activeTab === 'Requests' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('Requests'); }}><span className="nav-icon">📥</span> Requests</a>
+            <a href="#" className={`nav-item ${activeTab === 'Active Rentals' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('Active Rentals'); }}><span className="nav-icon">🔄</span> Active Rentals</a>
+            <a href="#" className={`nav-item ${activeTab === 'Drafts' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('Drafts'); }}><span className="nav-icon">📝</span> Drafts {drafts.length > 0 && <span className="nav-badge">{drafts.length}</span>}</a>
+            <a href="#" className={`nav-item ${activeTab === 'Overdue Rentals' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); setActiveTab('Overdue Rentals'); }}><span className="nav-icon">⚠️</span> Overdue {overdueBookings.length > 0 && <span className="nav-badge overdue-badge">{overdueBookings.length}</span>}</a>
           </nav>
 
-          <button className="sidebar-logout" onClick={handleLogout}><span>🚪</span> Sign Out</button>
+          <div className="sidebar-bottom-actions">
+            <button className="sidebar-switch-role" onClick={() => navigate('/dashboard')} style={{ width: '100%', marginBottom: '10px', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span>🔄</span> Back to Main Hub
+            </button>
+            <button className="sidebar-logout" onClick={handleLogout} style={{ width: '100%' }}>
+              <span>🚪</span> Sign Out
+            </button>
+          </div>
         </aside>
 
         {/* Main content */}
@@ -242,7 +320,9 @@ const LenderDashboard = () => {
           {fetchError && <div className="alert-error fade-up">⚠️ {fetchError}</div>}
 
           {/* Stats Grid */}
-          <div className="stats-grid fade-up" style={{ animationDelay: '0.1s' }}>
+          {activeTab === 'Dashboard' && (
+            <>
+              <div className="stats-grid fade-up" style={{ animationDelay: '0.1s' }}>
             {stats.map((stat) => (
               <div key={stat.label} className="stat-card glass-card">
                 <div className="stat-icon">{stat.icon}</div>
@@ -276,9 +356,12 @@ const LenderDashboard = () => {
               </div>
             </div>
           </div>
+          </>
+          )}
 
           {/* ─── Tabs Section ─── */}
-          <div className="glass-card listings-section fade-up" style={{ animationDelay: '0.3s' }}>
+          {activeTab !== 'Dashboard' && (
+            <div className="glass-card listings-section fade-up" style={{ animationDelay: '0.3s' }}>
             {/* Tab Bar */}
             <div className="tab-bar">
               {TABS.map((tab) => (
@@ -289,9 +372,12 @@ const LenderDashboard = () => {
                 >
                   {tab === 'My Listings' && '📦 '}
                   {tab === 'Drafts' && '📝 '}
+                  {tab === 'Requests' && '📥 '}
+                  {tab === 'Active Rentals' && '🔄 '}
                   {tab === 'Overdue Rentals' && '⚠️ '}
                   {tab}
-                  {tab === 'Drafts' && drafts.length > 0 && <span className="tab-count">{drafts.length}</span>}
+                  {tab === 'Requests' && pendingRequests.length > 0 && <span className="tab-count">{pendingRequests.length}</span>}
+                  {tab === 'Active Rentals' && activeBookings.length > 0 && <span className="tab-count">{activeBookings.length}</span>}
                   {tab === 'Overdue Rentals' && overdueBookings.length > 0 && <span className="tab-count overdue-count">{overdueBookings.length}</span>}
                 </button>
               ))}
@@ -341,6 +427,7 @@ const LenderDashboard = () => {
                         key={item._id} 
                         item={item} 
                         onDelete={handleDeleteItem} 
+                        onDeactivate={handleDeactivateItem}
                         onEdit={() => navigate('/list-item', { state: { item } })}
                         isRented={bookings.some(b => b.item?._id === item._id && ['active', 'overdue'].includes(b.status))}
                       />
@@ -374,6 +461,97 @@ const LenderDashboard = () => {
                         onPublish={() => handlePublishDraft(draft)}
                         onDelete={() => handleDeleteItem(draft._id)}
                       />
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ─── REQUESTS TAB ─── */}
+            {activeTab === 'Requests' && (
+              <>
+                <div className="listings-header">
+                  <h3 className="card-heading" style={{ borderBottom: 'none', paddingBottom: 0 }}>📥 Incoming Rental Requests</h3>
+                  <span className="listings-count">{pendingRequests.length} requests</span>
+                </div>
+                {loadingBookings ? (
+                  <div className="listings-loading"><div className="loading-spinner" /><p>Loading requests…</p></div>
+                ) : pendingRequests.length === 0 ? (
+                  <div className="empty-state" style={{ boxShadow: 'none', border: 'none', background: 'transparent' }}>
+                    <div className="empty-icon">📥</div>
+                    <h3>No pending requests</h3>
+                    <p>When borrowers request to rent your items, they will appear here for your approval.</p>
+                  </div>
+                ) : (
+                  <div className="overdue-list">
+                    {pendingRequests.map((req) => (
+                      <div key={req._id} className="overdue-card">
+                        <div className="overdue-card-left">
+                          {req.item?.image ? (
+                            <img src={`http://localhost:5000/${req.item.image.replace(/^[\\/]+/, '')}`} alt={req.item.name} className="overdue-item-img" />
+                          ) : (
+                            <div className="overdue-item-img-placeholder">📦</div>
+                          )}
+                        </div>
+                        <div className="overdue-card-body">
+                          <div className="overdue-card-top">
+                            <div>
+                              <h4 className="overdue-item-name">{req.item?.name}</h4>
+                              <p className="overdue-borrower">
+                                👤 {req.borrower?.fullname} · 🎓 {req.borrower?.campusRegistrationNumber}
+                              </p>
+                              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '4px' }}>
+                                📧 {req.borrower?.email} · 📱 {req.borrower?.phonenumber}
+                              </p>
+                            </div>
+                            <span className="active-days-badge" style={{ background: 'rgba(255,165,0,0.2)', color: 'orange' }}>
+                              ⏳ Pending
+                            </span>
+                          </div>
+                          <div className="overdue-dates">
+                            <span>📅 Requested: <strong>{new Date(req.createdAt).toLocaleDateString()}</strong></span>
+                          </div>
+                          <div className="overdue-actions" style={{ marginTop: '16px', display: 'flex', gap: '10px' }}>
+                            <button 
+                              className="overdue-btn returned-btn" 
+                              style={{ flex: 1, padding: '10px', background: 'var(--primary-color)', border: 'none', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                              onClick={() => handleApprove(req._id)}
+                            >
+                              ✅ Approve
+                            </button>
+                            <button 
+                              className="overdue-btn fine-btn" 
+                              style={{ flex: 1, padding: '10px', background: 'var(--danger-color, #ef4444)', border: 'none', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
+                              onClick={() => handleReject(req._id)}
+                            >
+                              ❌ Reject
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ─── ACTIVE RENTALS TAB ─── */}
+            {activeTab === 'Active Rentals' && (
+              <>
+                <div className="listings-header">
+                  <h3 className="card-heading" style={{ borderBottom: 'none', paddingBottom: 0 }}>🔄 Active Rentals</h3>
+                  <span className="listings-count">{activeBookings.length} active</span>
+                </div>
+                {activeBookings.length === 0 ? (
+                  <div className="empty-state" style={{ boxShadow: 'none', border: 'none', background: 'transparent' }}>
+                    <div className="empty-icon">🔄</div>
+                    <h3>No active rentals</h3>
+                    <p>None of your items are currently rented out.</p>
+                  </div>
+                ) : (
+                  <div className="overdue-list">
+                    {activeBookings.map((b) => (
+                      <ActiveBookingCard key={b._id} booking={b} onConfirmReturn={() => handleConfirmReturn(b._id)} />
                     ))}
                   </div>
                 )}
@@ -416,7 +594,7 @@ const LenderDashboard = () => {
                     </h4>
                     <div className="overdue-list">
                       {activeBookings.map((b) => (
-                        <ActiveBookingCard key={b._id} booking={b} />
+                        <ActiveBookingCard key={b._id} booking={b} onConfirmReturn={() => handleConfirmReturn(b._id)} />
                       ))}
                     </div>
                   </div>
@@ -424,6 +602,7 @@ const LenderDashboard = () => {
               </>
             )}
           </div>
+          )}
         </main>
       </div>
     </>
@@ -431,7 +610,7 @@ const LenderDashboard = () => {
 };
 
 // ─── Item Card ────────────────────────────────────────────────
-const ItemCard = ({ item, onDelete, onEdit, isRented }) => {
+const ItemCard = ({ item, onDelete, onEdit, onDeactivate, isRented }) => {
   const discountedPrice = item.discountPercentage > 0
     ? item.pricePerDay * (1 - item.discountPercentage / 100) : null;
 
@@ -439,7 +618,7 @@ const ItemCard = ({ item, onDelete, onEdit, isRented }) => {
     <div className="item-card glass-card">
       <div className="item-card-image">
         {item.image ? (
-          <img src={`http://localhost:5000${item.image}`} alt={item.name} className="item-img" />
+          <img src={`http://localhost:5000/${item.image.replace(/^[\\/]+/, '')}`} alt={item.name} className="item-img" />
         ) : (
           <div className="item-img-placeholder">📦</div>
         )}
@@ -472,17 +651,23 @@ const ItemCard = ({ item, onDelete, onEdit, isRented }) => {
           <span className="item-meta-chip">📍 {item.pickupLocation}</span>
           {item.finePerDay > 0 && <span className="item-meta-chip fine-chip">⚠️ Rs. {item.finePerDay}/day fine</span>}
         </div>
-        <div className="item-card-actions">
+        <div className="item-card-actions" style={{ display: 'flex', gap: '8px' }}>
           <button 
             className="item-action-btn draft-edit-btn" 
             onClick={onEdit} 
             disabled={isRented}
             title={isRented ? "Cannot edit an item while it is currently rented" : "Edit item"}
-            style={isRented ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+            style={isRented ? { opacity: 0.5, cursor: 'not-allowed', flex: 1 } : { flex: 1 }}
           >
             ✏️ Edit
           </button>
-          <button className="item-action-btn item-action-delete" onClick={() => onDelete(item._id)}>🗑️ Delete</button>
+          <button 
+            className="item-action-btn item-action-delete" 
+            onClick={() => onDeactivate(item._id)}
+            style={{ flex: 1 }}
+          >
+            🚫 Deactivate
+          </button>
         </div>
       </div>
     </div>
@@ -494,7 +679,7 @@ const DraftCard = ({ draft, onEdit, onPublish, onDelete }) => (
   <div className="item-card glass-card draft-card">
     <div className="item-card-image">
       {draft.image ? (
-        <img src={`http://localhost:5000${draft.image}`} alt={draft.name} className="item-img" />
+        <img src={`http://localhost:5000/${draft.image.replace(/^[\\/]+/, '')}`} alt={draft.name} className="item-img" />
       ) : (
         <div className="item-img-placeholder">📝</div>
       )}
@@ -533,7 +718,7 @@ const OverdueCard = ({ booking, onMarkReturned, onCollectFine }) => {
     <div className="overdue-card">
       <div className="overdue-card-left">
         {booking.item?.image ? (
-          <img src={`http://localhost:5000${booking.item.image}`} alt={booking.item.name} className="overdue-item-img" />
+          <img src={`http://localhost:5000/${booking.item.image.replace(/^[\\/]+/, '')}`} alt={booking.item.name} className="overdue-item-img" />
         ) : (
           <div className="overdue-item-img-placeholder">📦</div>
         )}
@@ -569,14 +754,14 @@ const OverdueCard = ({ booking, onMarkReturned, onCollectFine }) => {
 };
 
 // ─── Active Booking Card ──────────────────────────────────────
-const ActiveBookingCard = ({ booking }) => {
+const ActiveBookingCard = ({ booking, onConfirmReturn }) => {
   const daysLeft = Math.ceil((new Date(booking.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
 
   return (
     <div className="overdue-card active-booking-card">
       <div className="overdue-card-left">
         {booking.item?.image ? (
-          <img src={`http://localhost:5000${booking.item.image}`} alt={booking.item.name} className="overdue-item-img" />
+          <img src={`http://localhost:5000/${booking.item.image.replace(/^[\\/]+/, '')}`} alt={booking.item.name} className="overdue-item-img" />
         ) : (
           <div className="overdue-item-img-placeholder">📦</div>
         )}
@@ -587,12 +772,19 @@ const ActiveBookingCard = ({ booking }) => {
             <h4 className="overdue-item-name">{booking.item?.name}</h4>
             <p className="overdue-borrower">👤 {booking.borrower?.fullname} · 📱 {booking.borrower?.phonenumber}</p>
           </div>
-          <span className="active-days-badge">{daysLeft > 0 ? `⏳ ${daysLeft}d left` : '⚠️ Due today'}</span>
+          <span className="active-days-badge">{booking.status === 'returned' ? '✅ Returned (Pending Confirm)' : (daysLeft > 0 ? `⏳ ${daysLeft}d left` : '⚠️ Due today')}</span>
         </div>
         <div className="overdue-dates">
           <span>📅 Due: <strong>{new Date(booking.dueDate).toLocaleDateString()}</strong></span>
           <span>💰 Rs. {booking.totalCost?.toFixed(2)}</span>
         </div>
+        {booking.status === 'returned' && (
+          <div className="overdue-actions" style={{ marginTop: '16px' }}>
+            <button className="overdue-btn returned-btn" onClick={onConfirmReturn} style={{ width: '100%', padding: '10px', background: 'var(--primary-color, #10b981)', border: 'none', color: 'white', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+              ✅ Confirm Return
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
