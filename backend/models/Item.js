@@ -14,6 +14,16 @@ const itemSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        image: {
+            type: String,
+        },
+        isEmergency: {
+            type: Boolean,
+            default: false,
+        },
+        pricePerDay: {
+            type: Number,
+        },
         pricing: {
             depositAmount: {
                 type: Number,

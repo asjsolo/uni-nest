@@ -45,6 +45,9 @@ const rentalSchema = new mongoose.Schema(
             enum: ['Pending', 'Approved', 'Active', 'Returned', 'Disputed'],
             default: 'Pending',
         },
+        notes: {
+            type: String,
+        },
     },
     {
         timestamps: true,

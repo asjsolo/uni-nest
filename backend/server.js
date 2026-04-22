@@ -18,7 +18,8 @@ app.use(express.json());
 
 // Routes Placeholders
 // app.use('/api/inventory', inventoryRoutes); // Member 1
-// app.use('/api/borrowing', borrowingRoutes); // Member 2
+import borrowingRoutes from './routes/borrowingRoutes.js';
+app.use('/api', borrowingRoutes); // Mapped to /api to match frontend /api/items, /api/rentals
 // app.use('/api/analytics', analyticsRoutes); // Member 3
 app.use('/api/admin', adminRoutes);         // Member 4
 
