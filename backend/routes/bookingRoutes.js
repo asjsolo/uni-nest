@@ -92,7 +92,10 @@ router.put('/:id/approve', protect, async (req, res) => {
       return res.status(401).json({ message: 'Not authorized to approve this booking' });
     }
 
-    booking.status = 'approved';
+    booking.status = 'active';
+    booking.notifications.push({
+      message: 'Your booking request has been approved! The item is now rented.'
+    });
     await booking.save();
 
     res.json(booking);

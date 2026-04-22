@@ -256,9 +256,6 @@ const ListItem = () => {
             <a href="#" className="nav-item">
               <span className="nav-icon">💬</span> Messages
             </a>
-            <a href="#" className="nav-item">
-              <span className="nav-icon">⚙️</span> Settings
-            </a>
           </nav>
 
           <div className="sidebar-bottom-actions">
