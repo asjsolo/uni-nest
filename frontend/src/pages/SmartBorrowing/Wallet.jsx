@@ -10,7 +10,8 @@ import {
   Wallet as WalletIcon,
   ShieldCheck,
   Search,
-  Database
+  Database,
+  Clock
 } from "lucide-react";
 
 function Wallet() {
@@ -24,7 +25,15 @@ function Wallet() {
     const savedBalance = localStorage.getItem("walletBalance");
     const savedTransactions = localStorage.getItem("walletTransactions");
     if (savedBalance) setBalance(Number(savedBalance));
-    if (savedTransactions) setTransactions(JSON.parse(savedTransactions));
+    try {
+      if (savedTransactions) {
+        const parsed = JSON.parse(savedTransactions);
+        if (Array.isArray(parsed)) setTransactions(parsed);
+      }
+    } catch (e) {
+      console.error("Failed to parse transactions", e);
+      setTransactions([]);
+    }
   }, []);
 
   const handleAddFunds = (e) => {
@@ -34,16 +43,16 @@ function Wallet() {
     if (!amount.trim()) { setError("Amount entry required"); return; }
     if (isNaN(numericAmount) || numericAmount <= 0) { setError("Entry must be a positive numeric value"); return; }
     const newBalance = balance + numericAmount;
-    const newTransaction = { id: Date.now(), type: "Wallet Top Up", amount: numericAmount, date: new Date().toLocaleString() };
+    const newTransaction = { id: Date.now(), type: "Added Funds", amount: numericAmount, date: new Date().toLocaleString() };
     const updatedTransactions = [newTransaction, ...transactions];
-    setBalance(newBalance); setTransactions(updatedTransactions); setAmount(""); setSuccess("Liquidity allocation successful");
+    setBalance(newBalance); setTransactions(updatedTransactions); setAmount(""); setSuccess("Funds added successfully");
     localStorage.setItem("walletBalance", newBalance.toString());
     localStorage.setItem("walletTransactions", JSON.stringify(updatedTransactions));
     window.dispatchEvent(new Event("storage"));
   };
 
   const handleQuickAdd = (value) => { setAmount(String(value)); setError(""); setSuccess(""); };
-  const totalTopUps = transactions.reduce((sum, tx) => (tx.type === "Wallet Top Up" ? sum + Number(tx.amount) : sum), 0);
+  const totalTopUps = transactions.reduce((sum, tx) => (tx.type === "Added Funds" ? sum + Number(tx.amount) : sum), 0);
 
   return (
     <div className="bg-white">
@@ -59,11 +68,11 @@ function Wallet() {
                    <div className="flex items-center justify-between mb-12">
                       <div className="flex items-center gap-3 opacity-60">
                          <ShieldCheck size={18} />
-                         <span className="font-black text-[10px] uppercase tracking-[0.3em]">Corporate Ledger Account</span>
+                         <span className="font-black text-[10px] uppercase tracking-[0.3em]">Uni-Nest Wallet Account</span>
                       </div>
                       <WalletIcon size={24} className="text-emerald-500" strokeWidth={2.5} />
                    </div>
-                   <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-3">Available Operational Credits</p>
+                   <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-3">Available Balance</p>
                    <h2 className="text-6xl md:text-8xl font-display font-black tracking-tighter decoration-emerald-600 decoration-8 underline-offset-[16px]">
                       <span className="text-2xl text-emerald-400 mr-2">Rs.</span>{balance.toFixed(2)}
                    </h2>
@@ -79,8 +88,8 @@ function Wallet() {
                    </div>
                    <div className="h-10 w-px bg-white/5 hidden sm:block"></div>
                    <div>
-                       <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 leading-none">Auth Tier</p>
-                       <p className="font-black text-lg tracking-tight text-emerald-100/90">Institutional Verified</p>
+                       <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 leading-none">Status</p>
+                       <p className="font-black text-lg tracking-tight text-emerald-100/90">Verified Account</p>
                    </div>
                 </div>
             </div>
@@ -95,16 +104,16 @@ function Wallet() {
              <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center text-gray-900 mb-8 shadow-inner">
                 <TrendingUp size={36} strokeWidth={2.5} />
              </div>
-             <h3 className="text-xl font-display font-black text-gray-900 mb-8 uppercase tracking-[0.2em] leading-none">Ledger Overview</h3>
+             <h3 className="text-xl font-display font-black text-gray-900 mb-8 uppercase tracking-[0.2em] leading-none">Wallet Stats</h3>
              
              <div className="w-full space-y-4">
                 <div className="bg-gray-50/50 border border-gray-100 p-6 rounded-[1.8rem] group transition-all hover:bg-emerald-50 hover:border-emerald-200 text-left">
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">Aggregate Deposits</p>
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">Total Added</p>
                     <p className="text-2xl font-display font-black text-emerald-700 transition-transform group-hover:translate-x-1 tracking-tight">Rs. {totalTopUps.toFixed(2)}</p>
                 </div>
                 <div className="bg-gray-50/50 border border-gray-100 p-6 rounded-[1.8rem] group transition-all hover:bg-emerald-50 hover:border-emerald-200 text-left">
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">Record Count</p>
-                    <p className="text-2xl font-display font-black text-gray-900 transition-transform group-hover:translate-x-1 tracking-tight">{transactions.length} Indices</p>
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">Transactions</p>
+                    <p className="text-2xl font-display font-black text-gray-900 transition-transform group-hover:translate-x-1 tracking-tight">{transactions.length} Total</p>
                 </div>
              </div>
           </motion.div>
@@ -115,14 +124,14 @@ function Wallet() {
              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
              className="xl:col-span-4 bg-white border border-gray-100 rounded-[3rem] p-12 shadow-sm"
            >
-              <h2 className="text-2xl font-display font-black text-gray-900 mb-2 tracking-tight">Credit Allocation</h2>
+              <h2 className="text-2xl font-display font-black text-gray-900 mb-2 tracking-tight">Add Funds</h2>
               <div className="flex items-center gap-2 mt-2 mb-10">
                 <Plus size={14} className="text-emerald-500" />
-                <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest leading-none">Institutional Injection</p>
+                <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest leading-none">Wallet Recharge</p>
               </div>
 
               <div className="mb-10">
-                 <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] mb-4 leading-none text-center">Protocol presets</p>
+                 <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em] mb-4 leading-none text-center">Quick Amounts</p>
                  <div className="grid grid-cols-2 gap-3">
                     {[500, 1000, 2000, 5000].map(val => (
                        <button key={val} onClick={() => handleQuickAdd(val)} className="h-14 bg-gray-50 border border-gray-200 rounded-2xl font-black text-gray-800 hover:border-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 transition-all active:scale-95 text-xs">
@@ -149,7 +158,7 @@ function Wallet() {
 
                  <button type="submit" className="w-full h-18 bg-gray-900 hover:bg-emerald-600 text-white font-display font-black text-lg rounded-[1.5rem] shadow-2xl shadow-gray-900/10 active:scale-95 transition-all flex items-center justify-center gap-3 uppercase tracking-widest">
                     <Plus size={20} />
-                    Confirm Allocation
+                    Add Funds
                  </button>
               </form>
            </motion.div>
@@ -160,15 +169,15 @@ function Wallet() {
            >
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 pb-8 border-b border-gray-50">
                  <div>
-                    <h2 className="text-2xl font-display font-black text-gray-900 tracking-tight leading-none">Security Ledger Activity</h2>
+                    <h2 className="text-2xl font-display font-black text-gray-900 tracking-tight leading-none">Transaction History</h2>
                     <div className="flex items-center gap-2 mt-3 text-gray-400">
                         <History size={14} className="text-emerald-500" />
-                        <p className="font-black text-[10px] uppercase tracking-[0.2em] leading-tight">University Settlement Archive</p>
+                        <p className="font-black text-[10px] uppercase tracking-[0.2em] leading-tight">Activity History</p>
                     </div>
                  </div>
                  <div className="mt-6 md:mt-0 bg-gray-900 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] leading-none flex items-center gap-3 shadow-lg">
                     <Database size={14} className="text-emerald-400" />
-                    {transactions.length} Verified Entries
+                    {transactions.length} Verified Transactions
                  </div>
               </div>
 
@@ -177,8 +186,8 @@ function Wallet() {
                     <div className="w-20 h-20 bg-white rounded-[2rem] shadow-sm flex items-center justify-center mx-auto mb-8">
                         <TrendingUp size={40} strokeWidth={1.5} className="text-gray-300" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">Vault indices unavailable</h3>
-                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Your institutional transaction history is currently empty.</p>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">No transactions found</h3>
+                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Your transaction history is currently empty.</p>
                  </div>
               ) : (
                  <div className="space-y-4">
@@ -186,8 +195,8 @@ function Wallet() {
                        <div key={tx.id} className="p-8 rounded-[2rem] border border-gray-50 bg-gray-50/30 hover:bg-white hover:shadow-2xl hover:border-emerald-50 transition-all duration-300 group">
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                              <div className="flex items-center gap-6">
-                                <div className={`w-16 h-16 rounded-[1.4rem] flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 ${tx.type.includes('Top Up') ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
-                                  {tx.type.includes('Top Up') ? <ArrowDownLeft size={30} /> : <ArrowUpRight size={30} />}
+                                <div className={`w-16 h-16 rounded-[1.4rem] flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 ${tx.type.includes('Added Funds') ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-400'}`}>
+                                  {tx.type.includes('Added Funds') ? <ArrowDownLeft size={30} /> : <ArrowUpRight size={30} />}
                                 </div>
                                 <div className="uppercase">
                                    <p className="font-black text-gray-900 text-xl group-hover:text-emerald-700 transition-colors tracking-tight leading-none mb-2">{tx.type}</p>
@@ -198,8 +207,8 @@ function Wallet() {
                                 </div>
                              </div>
                              <div className="text-right">
-                                <p className={`text-3xl font-display font-black tracking-tight leading-none ${tx.type.includes('Top Up') ? 'text-emerald-600' : 'text-gray-900'}`}>
-                                   {tx.type.includes('Top Up') ? '+' : '-'} Rs. {Number(tx.amount).toFixed(2)}
+                                <p className={`text-3xl font-display font-black tracking-tight leading-none ${tx.type.includes('Added Funds') ? 'text-emerald-600' : 'text-gray-900'}`}>
+                                   {tx.type.includes('Added Funds') ? '+' : '-'} Rs. {Number(tx.amount).toFixed(2)}
                                 </p>
                                 <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest mt-2">{tx.id}</p>
                              </div>

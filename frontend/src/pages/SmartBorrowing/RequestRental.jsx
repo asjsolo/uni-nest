@@ -10,14 +10,15 @@ import {
   Package,
   ShieldCheck,
   Zap,
-  Info
+  Info,
+  Clock
 } from "lucide-react";
 
 function RequestRental() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
-  const [formData, setFormData] = useState({ startDate: "", endDate: "", paymentType: "Full Payment" });
+  const [formData, setFormData] = useState({ startDate: "", endDate: "", paymentType: "Full" });
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
@@ -37,10 +38,10 @@ function RequestRental() {
 
   const validate = () => {
     let tempErrors = {};
-    if (!formData.startDate) tempErrors.startDate = "Initiation date required.";
-    if (!formData.endDate) tempErrors.endDate = "Termination date required.";
+    if (!formData.startDate) tempErrors.startDate = "Start date required.";
+    if (!formData.endDate) tempErrors.endDate = "End date required.";
     if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-      tempErrors.endDate = "End of lease must proceed start date.";
+      tempErrors.endDate = "End date must be after start date.";
     }
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -53,7 +54,7 @@ function RequestRental() {
         const res = await fetch("http://localhost:5000/api/rentals", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemId: id, ...formData, totalAmount: item.price }),
+          body: JSON.stringify({ itemId: id, ...formData, totalAmount: item.pricePerDay }),
         });
         if (res.ok) {
           setSuccess(true);
@@ -74,7 +75,7 @@ function RequestRental() {
           <div className="p-2 border border-gray-100 rounded-lg group-hover:bg-emerald-50 group-hover:border-emerald-50 transition-all">
             <ArrowLeft size={16} />
           </div>
-          System Registry Return
+          Back to Item
         </Link>
       </motion.div>
 
@@ -90,24 +91,24 @@ function RequestRental() {
                       <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-emerald-600">
                         <Package size={22} strokeWidth={2.5} />
                       </div>
-                      <div>
-                        <h2 className="text-xl font-display font-black text-gray-900 leading-none">Security Summary</h2>
-                        <p className="text-[9px] font-black text-gray-400 tracking-widest mt-2 uppercase">Vault Reference ID: {id.slice(-6)}</p>
-                      </div>
+                       <div>
+                         <h2 className="text-xl font-display font-black text-gray-900 leading-none">Order Summary</h2>
+                         <p className="text-[9px] font-black text-gray-400 tracking-widest mt-2 uppercase">Item ID: {id?.slice(-6) || "N/A"}</p>
+                       </div>
                    </div>
 
                    {item && (
                     <>
                       <h3 className="text-3xl font-display font-black text-gray-800 mb-8 tracking-tighter leading-none">{item.title}</h3>
                       <div className="space-y-4">
-                         <div className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl">
-                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Base Rate</span>
-                            <span className="font-black text-gray-900 text-lg">Rs. {item.price}</span>
-                         </div>
-                         <div className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl">
-                            <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Lease Terms</span>
-                             <span className="font-black text-gray-900 text-lg uppercase tracking-tight">{item.rentStatus} Protocol</span>
-                         </div>
+                          <div className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl">
+                             <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Price per day</span>
+                             <span className="font-black text-gray-900 text-lg">Rs. {item.pricePerDay}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-2xl">
+                             <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Rental Type</span>
+                              <span className="font-black text-gray-900 text-lg uppercase tracking-tight">Daily</span>
+                          </div>
                       </div>
                     </>
                    )}
@@ -118,9 +119,9 @@ function RequestRental() {
                 <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-600 mb-6 shadow-sm border border-emerald-50">
                    <ShieldCheck size={28} />
                 </div>
-                <h4 className="text-xs font-black text-emerald-900 uppercase tracking-[0.2em] mb-3">Modular Guarantee v1</h4>
-                <p className="text-[11px] font-bold text-emerald-700/60 leading-relaxed uppercase tracking-tight">Your modular request will be indexed in the university registry immediately upon authorization.</p>
-             </div>
+                 <h4 className="text-xs font-black text-emerald-900 uppercase tracking-[0.2em] mb-3">Secure Rental</h4>
+                 <p className="text-[11px] font-bold text-emerald-700/60 leading-relaxed uppercase tracking-tight">Your request will be sent to the owner immediately after you confirm.</p>
+              </div>
           </div>
 
           {/* Right: Request Form */}
@@ -130,11 +131,11 @@ function RequestRental() {
           >
              <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-12 pb-8 border-b border-gray-50">
-                   <div className="w-14 h-14 bg-gray-900 text-white rounded-[1.4rem] flex items-center justify-center shadow-lg group-hover/form:scale-110 transition-transform">
-                      <Calendar size={26} strokeWidth={2.5} />
-                   </div>
-                   <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight leading-none uppercase underline decoration-emerald-500 decoration-8 underline-offset-8">Configure Lease</h1>
-                </div>
+                    <div className="w-14 h-14 bg-gray-900 text-white rounded-[1.4rem] flex items-center justify-center shadow-lg group-hover/form:scale-110 transition-transform">
+                       <Calendar size={26} strokeWidth={2.5} />
+                    </div>
+                    <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight leading-none uppercase underline decoration-emerald-500 decoration-8 underline-offset-8">Rental Dates</h1>
+                 </div>
 
                 <AnimatePresence mode="wait">
                   {success ? (
@@ -142,8 +143,8 @@ function RequestRental() {
                       <div className="w-20 h-20 bg-white/20 rounded-[2rem] flex items-center justify-center mx-auto mb-8">
                          <CheckCircle2 size={40} />
                       </div>
-                      <h3 className="text-3xl font-display font-black mb-4 uppercase tracking-tighter">Agreement Indexed</h3>
-                      <p className="font-bold opacity-80 uppercase text-[10px] tracking-[0.3em]">Handoff Protocol Initialized Successfully</p>
+                       <h3 className="text-3xl font-display font-black mb-4 uppercase tracking-tighter">Request Sent</h3>
+                       <p className="font-bold opacity-80 uppercase text-[10px] tracking-[0.3em]">Wait for owner approval</p>
                     </motion.div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-10">
@@ -151,7 +152,7 @@ function RequestRental() {
                         <div>
                           <div className="flex items-center gap-2 mb-4 px-2">
                              <Calendar size={12} className="text-gray-300" />
-                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Lease Activation</label>
+                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Start Date</label>
                           </div>
                           <input
                             type="date"
@@ -171,7 +172,7 @@ function RequestRental() {
                         <div>
                           <div className="flex items-center gap-2 mb-4 px-2">
                              <Clock size={12} className="text-gray-300" />
-                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Termination Event</label>
+                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">End Date</label>
                           </div>
                           <input
                             type="date"
@@ -193,10 +194,10 @@ function RequestRental() {
                       <div>
                         <div className="flex items-center gap-2 mb-4 px-2">
                            <CreditCard size={12} className="text-gray-300" />
-                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Payment Strategy Allocation</label>
-                        </div>
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Payment Method</label>
+                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                           {["Full Payment", "Deposit"].map(type => (
+                            {["Full", "Deposit"].map(type => (
                              <button
                                 key={type}
                                 type="button"
@@ -205,9 +206,9 @@ function RequestRental() {
                                   formData.paymentType === type ? "bg-emerald-500 border-emerald-500 text-white shadow-xl shadow-emerald-500/20" : "bg-gray-50 border-gray-100 text-gray-400 hover:border-gray-200"
                                 }`}
                              >
-                               {type}
+                               {type === "Full" ? "Full Payment" : type}
                              </button>
-                           ))}
+                            ))}
                         </div>
                       </div>
 
@@ -230,11 +231,11 @@ function RequestRental() {
                            type="submit"
                            className="w-full h-20 bg-gray-900 hover:bg-emerald-600 text-white font-display font-black text-lg rounded-[2rem] shadow-2xl shadow-emerald-500/10 active:scale-95 transition-all flex items-center justify-center gap-4 group/btn relative overflow-hidden"
                          >
-                            <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
-                            <Zap size={22} strokeWidth={3} fill="currentColor" />
-                            Sign & Authorize Lease
-                         </button>
-                         <p className="text-center text-[9px] text-gray-400 font-black mt-10 uppercase tracking-[0.4em] opacity-30">UniNest Modular Protocol Settlement Archive</p>
+                             <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
+                             <Zap size={22} strokeWidth={3} fill="currentColor" />
+                             Confirm Rental
+                          </button>
+                         <p className="text-center text-[9px] text-gray-400 font-black mt-10 uppercase tracking-[0.4em] opacity-30">Uni-Nest Secure Rental System</p>
                       </div>
                     </form>
                   )}

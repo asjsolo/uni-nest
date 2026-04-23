@@ -72,7 +72,7 @@ function MainLayout() {
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping absolute inset-0"></div>
                     <div className="w-2 h-2 rounded-full bg-emerald-500 relative"></div>
                   </div>
-                  <span className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">Mainnet: Connected</span>
+                  <span className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">Status: Online</span>
                </div>
              </div>
            </div>

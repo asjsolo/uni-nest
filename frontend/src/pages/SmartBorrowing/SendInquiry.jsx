@@ -70,7 +70,7 @@ function SendInquiry() {
           <div className="p-2 border border-gray-100 rounded-lg group-hover:bg-emerald-50 group-hover:border-emerald-50 transition-all">
             <ArrowLeft size={16} />
           </div>
-          Back to Asset Registry
+          Back to Item
         </Link>
       </motion.div>
 
@@ -87,8 +87,8 @@ function SendInquiry() {
                     <MessageSquare size={26} strokeWidth={2.5} />
                  </div>
                  <div>
-                    <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight leading-none uppercase underline decoration-emerald-500 decoration-4 underline-offset-8">Initiate Request</h1>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-4">Module: Inquiries v2.1.0</p>
+                    <h1 className="text-3xl font-display font-black text-gray-900 tracking-tight leading-none uppercase underline decoration-emerald-500 decoration-4 underline-offset-8">Send Inquiry</h1>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-4">Safe & Secure Messaging</p>
                  </div>
               </div>
 
@@ -96,13 +96,13 @@ function SendInquiry() {
                 <div className="bg-gray-50/50 rounded-[2rem] p-10 border border-gray-100 mb-12 shadow-inner group-hover:bg-white transition-colors duration-500">
                    <div className="flex items-center gap-3 mb-6">
                       <Info size={14} className="text-gray-300" />
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Record Identifier</p>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Item Details</p>
                    </div>
                    <h2 className="text-3xl font-display font-black text-gray-800 tracking-tighter mb-4 leading-none">{item.title}</h2>
                    <div className="flex flex-wrap gap-4 mt-6">
                       <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-100 shadow-sm transition-transform hover:scale-105">
                          <ShieldCheck size={12} className="text-emerald-500" />
-                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest leading-none">Security ID: {item._id.slice(-6)}</span>
+                         <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest leading-none">ID: {item._id.slice(-6)}</span>
                       </div>
                       <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-100 shadow-sm transition-transform hover:scale-105">
                          <User size={12} className="text-gray-300" />
@@ -118,19 +118,19 @@ function SendInquiry() {
                     <div className="w-16 h-16 bg-white/20 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6">
                        <CheckCircle2 size={32} />
                     </div>
-                    <h3 className="text-2xl font-display font-black mb-2 uppercase tracking-tight">Transmission Successful</h3>
-                    <p className="font-bold opacity-80 uppercase text-[10px] tracking-[0.3em]">Handoff Request Recorded in Peer Registry</p>
+                    <h3 className="text-2xl font-display font-black mb-2 uppercase tracking-tight">Message Sent</h3>
+                    <p className="font-bold opacity-80 uppercase text-[10px] tracking-[0.3em]">Your inquiry has been sent to the owner.</p>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-8">
                     <div>
                       <div className="flex items-center justify-between mb-4 px-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Message Statement</label>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Your Message</label>
                         <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest leading-none">Min 10 Characters</span>
                       </div>
                       <textarea
                         rows="6"
-                        placeholder="State your operational requirement or inquiry regarding this asset..."
+                        placeholder="Type your message here..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         className={`w-full bg-gray-50/50 border rounded-[2rem] p-8 outline-none focus:ring-4 transition-all font-medium text-lg leading-relaxed shadow-inner placeholder:text-gray-300 ${
@@ -154,7 +154,7 @@ function SendInquiry() {
                        >
                           <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000" />
                           <Send size={24} strokeWidth={3} />
-                          Dispatch Message
+                          Send Message
                        </button>
                     </div>
                   </form>
@@ -168,7 +168,7 @@ function SendInquiry() {
              <ShieldCheck size={24} />
            </div>
            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">
-             Security Note: All modular communications are indexed for peer transparency. Ensure your message adheres to the UniNest framework protocols for asset exchange.
+             Note: Be polite and clear in your message. This helps the owners respond faster to your inquiry.
            </p>
         </div>
       </div>

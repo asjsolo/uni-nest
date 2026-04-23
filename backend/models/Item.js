@@ -24,29 +24,19 @@ const itemSchema = new mongoose.Schema(
         pricePerDay: {
             type: Number,
         },
-        pricing: {
-            depositAmount: {
-                type: Number,
-                required: true,
-            },
-            fullPrice: {
-                type: Number,
-                required: true,
-            },
-        },
-        status: {
-            type: String,
-            enum: ['Available', 'Rented', 'Deactivated'],
-            default: 'Available',
+        isAvailable: {
+            type: Boolean,
+            default: true,
         },
         lender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true,
+            // Made optional to support user's manual items2 data
         },
     },
     {
         timestamps: true,
+        collection: 'items2'
     }
 );
 

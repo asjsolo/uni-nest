@@ -29,7 +29,7 @@ function ItemDetails() {
       try {
         const res = await fetch(`http://localhost:5000/api/items/${id}`);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Asset identification failed");
+        if (!res.ok) throw new Error(data.message || "Could not find this item");
         setItem(data);
       } catch (err) {
         setError(err.message);
@@ -49,10 +49,10 @@ function ItemDetails() {
           <div className="w-20 h-20 bg-red-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-red-500">
             <AlertCircle size={40} />
           </div>
-          <h2 className="text-3xl font-display font-black text-gray-900 mb-4 tracking-tight uppercase">Registry Synchronization Fault</h2>
+          <h2 className="text-3xl font-display font-black text-gray-900 mb-4 tracking-tight uppercase">Item Not Found</h2>
           <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-12">{error}</p>
           <Link to="/buyer/items" className="bg-gray-900 text-white font-black px-10 py-5 rounded-2xl shadow-xl hover:bg-emerald-600 active:scale-95 transition-all text-xs uppercase tracking-widest">
-            Back to Inventory
+            Back to Marketplace
           </Link>
         </motion.div>
       </div>
@@ -66,7 +66,7 @@ function ItemDetails() {
           <div className="p-2 border border-gray-100 rounded-lg group-hover:bg-emerald-50 group-hover:border-emerald-50 transition-all">
             <ArrowLeft size={16} />
           </div>
-          System Inventory Archive
+          Back to Marketplace
         </Link>
       </motion.div>
 
@@ -83,16 +83,16 @@ function ItemDetails() {
                 <div className="flex flex-wrap items-center gap-4 mb-10">
                    <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 shadow-sm">
                       <ShieldCheck size={14} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Verified Log</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">Verified Item</span>
                    </div>
                    <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-400 rounded-xl border border-gray-100">
                       <Tag size={12} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">{item.category} Module</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">{item.category} Category</span>
                    </div>
                    {item.isEmergency && (
                       <div className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl border border-red-100 animate-pulse">
                         <AlertCircle size={14} />
-                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Priority Assignment</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest leading-none">Emergency</span>
                       </div>
                    )}
                 </div>
@@ -104,7 +104,7 @@ function ItemDetails() {
                 <div className="bg-gray-50/50 rounded-[2rem] p-10 border border-gray-100 shadow-inner group-hover:bg-white transition-colors duration-500">
                    <div className="flex items-center gap-3 mb-6">
                       <Info size={16} className="text-gray-300" />
-                      <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Asset Specifications</h3>
+                      <h3 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Product Details</h3>
                    </div>
                    <p className="text-gray-600 text-lg md:text-xl font-medium leading-relaxed italic border-l-4 border-emerald-500 pl-8">
                      "{item.description}"
@@ -120,7 +120,7 @@ function ItemDetails() {
                        <MapPin size={22} />
                     </div>
                     <div>
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Registry Location</p>
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Location</p>
                        <p className="text-xl font-display font-black text-gray-900 tracking-tight">{item.location}</p>
                     </div>
                  </div>
@@ -131,8 +131,8 @@ function ItemDetails() {
                        <Calendar size={22} />
                     </div>
                     <div>
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Availability Lifecycle</p>
-                       <p className="text-xl font-display font-black text-gray-900 tracking-tight">Active Protocol</p>
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Availability</p>
+                       <p className="text-xl font-display font-black text-gray-900 tracking-tight">{item.isAvailable ? 'Available Now' : 'Currently Rented'}</p>
                     </div>
                  </div>
               </div>
@@ -152,27 +152,27 @@ function ItemDetails() {
                    <div className="flex items-center justify-between mb-10 opacity-30 group-hover/card:opacity-100 transition-opacity">
                       <div className="flex items-center gap-3">
                          <Layers size={16} />
-                         <span className="font-black text-[9px] uppercase tracking-[0.3em]">Module: Financials.v1</span>
+                         <span className="font-black text-[9px] uppercase tracking-[0.3em]">Item Pricing</span>
                       </div>
                       <ShieldCheck size={18} className="text-emerald-500" />
                    </div>
-                   <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-4">Required Resource Settlement</p>
+                   <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] mb-4">Price per day</p>
                    <div className="flex items-end gap-3">
                       <h2 className="text-7xl font-display font-black tracking-tighter leading-none decoration-emerald-500 decoration-8 underline-offset-[14px]">
-                        Rs. {item.price}
+                        Rs. {item.pricePerDay}
                       </h2>
-                      <span className="text-emerald-500 font-bold text-sm uppercase tracking-widest mb-2 opacity-60">/ Session</span>
+                      <span className="text-emerald-500 font-bold text-sm uppercase tracking-widest mb-2 opacity-60">/ Day</span>
                    </div>
                  </div>
 
                  <div className="space-y-4 mb-12">
                     <div className="p-6 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md flex items-center justify-between group/line hover:bg-white/10 transition-colors">
-                       <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Lease Contract</span>
-                       <span className="font-black text-lg tracking-tight uppercase">{item.rentStatus} Protocol</span>
+                       <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Rental Type</span>
+                       <span className="font-black text-lg tracking-tight uppercase">Daily</span>
                     </div>
                     <div className="p-6 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md flex items-center justify-between group/line hover:bg-white/10 transition-colors">
                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">System Record</span>
-                       <span className="font-mono text-xs opacity-60">UID: {item._id.slice(-8)}</span>
+                       <span className="font-mono text-xs opacity-60">ID: {item._id.slice(-8)}</span>
                     </div>
                  </div>
 
@@ -183,18 +183,18 @@ function ItemDetails() {
                     >
                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/action:translate-x-[100%] transition-transform duration-1000" />
                        <Zap size={24} strokeWidth={3} fill="currentColor" />
-                       Deploy Lease
+                       Rent Now
                     </button>
                     <button
                       onClick={() => navigate(`/buyer/inquiry/${item._id}`)}
                       className="w-full h-16 bg-white/5 hover:bg-white/10 text-white font-black text-[11px] rounded-[1.5rem] border border-white/10 transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 backdrop-blur-md"
                     >
                        <MessageSquare size={16} />
-                       Initialize Inquiry
+                       Message Owner
                     </button>
                  </div>
 
-                 <p className="text-center text-[8px] text-gray-700 font-black mt-10 uppercase tracking-[0.5em] opacity-40">Secured via Student-to-Student Multi-Sig Protocol</p>
+                 <p className="text-center text-[8px] text-gray-700 font-black mt-10 uppercase tracking-[0.5em] opacity-40">Secured Student-to-Student Exchange</p>
               </div>
            </motion.div>
 
@@ -202,8 +202,8 @@ function ItemDetails() {
               <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-emerald-600 mb-6 shadow-sm border border-emerald-50">
                  <ShieldCheck size={24} />
               </div>
-              <h4 className="text-sm font-black text-emerald-900 uppercase tracking-widest mb-3">Institutional Guarantee</h4>
-              <p className="text-[11px] font-bold text-emerald-700/60 leading-relaxed uppercase tracking-tight">All assets in this archive are verified under university peer agreement protocols to ensure safe discovery and exchange.</p>
+              <h4 className="text-sm font-black text-emerald-900 uppercase tracking-widest mb-3">Student Guarantee</h4>
+              <p className="text-[11px] font-bold text-emerald-700/60 leading-relaxed uppercase tracking-tight">All items are verified by students to ensure a safe and reliable exchange within the community.</p>
            </div>
         </div>
       </div>

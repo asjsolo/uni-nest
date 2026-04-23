@@ -23,11 +23,11 @@ function ItemCard({ item }) {
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${item.isEmergency ? "bg-red-500 animate-pulse" : "bg-emerald-500"}`}></div>
               <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${item.isEmergency ? "text-red-600" : "text-emerald-700"}`}>
-                {item.isEmergency ? "Priority Asset" : "Verified"}
+                {item.isEmergency ? "Emergency" : "Verified"}
               </span>
             </div>
-            <div className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${item.status === 'Available' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-gray-100 text-gray-400 border-gray-200'}`}>
-               {item.status}
+            <div className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${item.isAvailable ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-gray-100 text-gray-400 border-gray-200'}`}>
+               {item.isAvailable ? 'Available' : 'Rented'}
             </div>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1 bg-gray-50 rounded-lg border border-gray-100 text-gray-400">
@@ -50,10 +50,10 @@ function ItemCard({ item }) {
            <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-gray-400 border border-gray-100">
               <Clock size={14} />
            </div>
-           <div>
-              <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Lease Type</p>
-              <p className="text-xs font-bold text-gray-700">{item.rentStatus}</p>
-           </div>
+            <div>
+              <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Rental Type</p>
+              <p className="text-xs font-bold text-gray-700">Daily</p>
+            </div>
         </div>
         <div className="flex items-center gap-2">
            <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center text-emerald-500 border border-emerald-50">
@@ -61,7 +61,7 @@ function ItemCard({ item }) {
            </div>
            <div>
               <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Pricing</p>
-              <p className="text-xs font-bold text-gray-900 leading-none mt-1">Rs. {item.price}</p>
+              <p className="text-xs font-bold text-gray-900 leading-none mt-1">Rs. {item.pricePerDay}</p>
            </div>
         </div>
       </div>
@@ -73,7 +73,7 @@ function ItemCard({ item }) {
           className="w-full h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center gap-3 font-black text-xs uppercase tracking-[0.2em] group/btn transition-all hover:bg-emerald-600 hover:shadow-xl hover:shadow-emerald-600/20 active:scale-95"
         >
           <Eye size={16} strokeWidth={2.5} />
-          Inspect Record
+          View Details
         </Link>
       </div>
     </motion.div>

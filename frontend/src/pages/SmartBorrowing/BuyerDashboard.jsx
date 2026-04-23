@@ -61,13 +61,13 @@ function BuyerDashboard() {
             <div className="relative z-10">
                <div className="flex items-center gap-2 mb-6">
                  <ShieldCheck size={16} className="text-emerald-300" />
-                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-100">Portal Version 4.0 // Verified</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-100">Everything in one place</span>
                </div>
                <h1 className="text-4xl md:text-5xl font-display font-black leading-tight mb-4 tracking-tighter">
                  Everything You Need, <br/>On a Single Dashboard.
                </h1>
                <p className="text-emerald-50/80 text-lg font-medium max-w-xl mb-12 leading-relaxed">
-                 Seamlessly facilitate university logistics through our high-performance peer-to-peer ecosystem.
+                 Easily rent items from other students or share your own things with the university community.
                </p>
                <div className="flex flex-wrap gap-4">
                   <Link to="/buyer/items" className="bg-white text-emerald-700 font-black px-10 py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-3">
@@ -76,7 +76,7 @@ function BuyerDashboard() {
                   </Link>
                   <Link to="/buyer/wallet" className="bg-emerald-700/50 backdrop-blur-md text-white font-black px-10 py-4 rounded-2xl border border-white/10 hover:bg-emerald-700/70 transition-all flex items-center gap-3">
                     <Wallet size={18} />
-                    Wallet Management
+                    Manage Wallet
                   </Link>
                </div>
             </div>
@@ -92,10 +92,10 @@ function BuyerDashboard() {
              <div className="relative z-10 h-full flex flex-col justify-between">
                 <div>
                    <div className="flex items-center justify-between mb-8 opacity-40">
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em]">Institutional Vault</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em]">Uni-Nest Wallet</p>
                       <TrendingUp size={16} />
                    </div>
-                   <p className="text-gray-400 font-bold text-sm mb-2">Total Credit Liquidity</p>
+                   <p className="text-gray-400 font-bold text-sm mb-2">Available Balance</p>
                    <h2 className="text-5xl font-display font-black tracking-tighter mb-2">
                      <span className="text-2xl text-emerald-500 mr-2">Rs.</span>{walletBalance.toFixed(2)}
                    </h2>
@@ -112,7 +112,7 @@ function BuyerDashboard() {
                    <Link to="/buyer/wallet" className="group/btn relative w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs rounded-[1.5rem] transition-all shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-3 uppercase tracking-widest overflow-hidden">
                      <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
                      <Plus size={16} />
-                     Deposit Credits
+                     Add Funds
                    </Link>
                 </div>
              </div>
@@ -138,7 +138,7 @@ function BuyerDashboard() {
                  <div className="w-12 h-12 rounded-2xl bg-gray-50 group-hover:bg-emerald-50 flex items-center justify-center transition-colors">
                     <Icon size={22} className="text-gray-400 group-hover:text-emerald-600" />
                  </div>
-                 <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Analytics.v1</span>
+                 <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Dashboard Stats</span>
               </div>
               <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1.5 leading-none">{stat.label}</p>
               <h3 className={`text-4xl font-display font-black leading-none ${stat.color}`}>{stat.value}</h3>
@@ -153,8 +153,8 @@ function BuyerDashboard() {
             <div className="bg-white border border-gray-100 rounded-[2.5rem] p-10 shadow-sm transition-all hover:shadow-lg">
                 <div className="flex items-center justify-between mb-10">
                    <div>
-                    <h2 className="text-2xl font-display font-black text-gray-900 tracking-tight">Deployment Hub</h2>
-                    <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">Direct access to module operations.</p>
+                    <h2 className="text-2xl font-display font-black text-gray-900 tracking-tight">Quick Actions</h2>
+                    <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">Direct access to common tasks.</p>
                    </div>
                 </div>
                 
@@ -164,8 +164,8 @@ function BuyerDashboard() {
                         <Search size={24} className="text-emerald-600" />
                       </div>
                       <div>
-                         <p className="font-black text-emerald-900 group-hover:text-white transition-colors text-lg tracking-tight">Initiate Discovery</p>
-                         <p className="text-[10px] text-emerald-700/60 group-hover:text-emerald-100 font-black uppercase tracking-widest mt-1">Global Marketplace</p>
+                         <p className="font-black text-emerald-900 group-hover:text-white transition-colors text-lg tracking-tight">Browse Items</p>
+                         <p className="text-[10px] text-emerald-700/60 group-hover:text-emerald-100 font-black uppercase tracking-widest mt-1">Marketplace</p>
                       </div>
                       <ChevronRight size={18} className="ml-auto text-emerald-200 group-hover:text-white group-hover:translate-x-1 transition-all" />
                    </Link>
@@ -174,8 +174,8 @@ function BuyerDashboard() {
                         <Package size={24} className="text-gray-900" />
                       </div>
                       <div>
-                         <p className="font-black text-gray-900 group-hover:text-white transition-colors text-lg tracking-tight">Rental Tracking</p>
-                         <p className="text-[10px] text-gray-500 group-hover:text-gray-400 font-black uppercase tracking-widest mt-1">Lifecycle Records</p>
+                         <p className="font-black text-gray-900 group-hover:text-white transition-colors text-lg tracking-tight">My Rentals</p>
+                         <p className="text-[10px] text-gray-500 group-hover:text-gray-400 font-black uppercase tracking-widest mt-1">Tracking</p>
                       </div>
                       <ChevronRight size={18} className="ml-auto text-gray-300 group-hover:text-white group-hover:translate-x-1 transition-all" />
                    </Link>
@@ -188,9 +188,9 @@ function BuyerDashboard() {
                     <div className="relative z-10">
                        <h2 className="text-2xl font-display font-black tracking-tight flex items-center gap-3">
                          <AlertTriangle size={24} className="text-red-200" />
-                         Emergency Protocol Engaged
+                         Emergency Items
                        </h2>
-                       <p className="text-red-100/70 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Prioritized Asset Fulfillment Required</p>
+                       <p className="text-red-100/70 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Prioritized items needing attention</p>
                     </div>
                     <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/20 animate-pulse">
                       <Activity size={20} />
@@ -219,8 +219,8 @@ function BuyerDashboard() {
          <div className="bg-white border border-gray-100 rounded-[2.5rem] p-10 shadow-sm relative overflow-hidden transition-all hover:shadow-lg">
             <div className="relative z-10 h-full flex flex-col">
                <div className="flex items-center justify-between mb-10">
-                  <h2 className="text-2xl font-display font-black text-gray-900 tracking-tight leading-none">Security Ledger</h2>
-                  <div className="px-3 py-1.5 rounded-lg bg-gray-50 text-[9px] font-black text-gray-400 uppercase tracking-widest border border-gray-100">Live Stream</div>
+                  <h2 className="text-2xl font-display font-black text-gray-900 tracking-tight leading-none">Recently Added</h2>
+                  <div className="px-3 py-1.5 rounded-lg bg-gray-50 text-[9px] font-black text-gray-400 uppercase tracking-widest border border-gray-100">Live Feed</div>
                </div>
 
                <div className="space-y-8 flex-grow">
@@ -228,13 +228,13 @@ function BuyerDashboard() {
                     <div key={idx} className="relative pl-8 border-l-2 border-gray-100 last:border-0 pb-10">
                        <div className="absolute -left-[9px] top-0 w-4 h-4 bg-white rounded-full border-2 border-gray-200 group-hover:border-emerald-500 transition-colors"></div>
                        <div className="-mt-1">
-                          <p className="text-xs font-black text-gray-900 uppercase tracking-widest">Entry: Network Authorization</p>
+                          <p className="text-xs font-black text-gray-900 uppercase tracking-widest">New Item Added</p>
                           <div className="flex items-center gap-2 mt-2 text-[10px] font-bold text-gray-400">
                              <Clock size={12} />
                              <span>{new Date().toLocaleTimeString()}</span>
                           </div>
                           <div className="mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-100/50">
-                             <p className="text-[11px] font-bold text-gray-600 leading-relaxed italic">Reference asset: "{item.title}" successfully indexed for peer discovery.</p>
+                             <p className="text-[11px] font-bold text-gray-600 leading-relaxed italic">The item "{item.title}" is now available for rent.</p>
                           </div>
                        </div>
                     </div>
@@ -242,7 +242,7 @@ function BuyerDashboard() {
                </div>
 
                <button className="w-full py-4 mt-4 bg-gray-50 border border-gray-100 rounded-2xl font-black text-[10px] text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all uppercase tracking-[0.2em]">
-                 Load System History
+                 View More History
                </button>
             </div>
          </div>

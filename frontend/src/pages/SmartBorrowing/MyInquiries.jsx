@@ -42,10 +42,10 @@ function MyInquiries() {
     return (
         <div className="bg-white">
             <div className="mb-12">
-                <h1 className="text-4xl font-display font-black text-gray-900 mb-1 tracking-tight">Active Communications</h1>
+                <h1 className="text-4xl font-display font-black text-gray-900 mb-1 tracking-tight">My Messages</h1>
                 <div className="flex items-center gap-2 mt-2">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] leading-none">Security Monitored Conversations</p>
+                    <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] leading-none">Private Messages</p>
                 </div>
             </div>
 
@@ -58,8 +58,8 @@ function MyInquiries() {
                     <div className="w-20 h-20 bg-white rounded-[2rem] shadow-sm flex items-center justify-center mx-auto mb-8">
                         <Inbox size={40} strokeWidth={1.5} className="text-gray-300" />
                     </div>
-                    <h2 className="text-2xl font-display font-black text-gray-900 mb-2 tracking-tight">No Active Tickets</h2>
-                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Your modular communication history is currently empty.</p>
+                    <h2 className="text-2xl font-display font-black text-gray-900 mb-2 tracking-tight">No Messages</h2>
+                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Your message history is currently empty.</p>
                 </motion.div>
             ) : (
                 <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-8">
@@ -76,12 +76,12 @@ function MyInquiries() {
                                     </div>
                                     <div>
                                         <h2 className="text-2xl font-display font-black text-gray-900 group-hover:text-emerald-700 transition-colors tracking-tight leading-tight">
-                                            {inquiry.item?.title || "Missing Asset Component"}
+                                            {inquiry.item?.title || "Unknown Item"}
                                         </h2>
                                         <div className="flex items-center gap-3 mt-4">
                                            <Clock size={12} className="text-gray-400" />
                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
-                                               Indexed on {new Date(inquiry.createdAt || Date.now()).toLocaleDateString()}
+                                               Date: {new Date(inquiry.createdAt || Date.now()).toLocaleDateString()}
                                            </p>
                                         </div>
                                     </div>
@@ -101,12 +101,12 @@ function MyInquiries() {
                             <div className="pl-0 md:pl-24">
                                 <div className="flex items-center gap-2 mb-4">
                                     <User size={12} className="text-gray-300" />
-                                    <p className="text-gray-300 text-[10px] uppercase font-black tracking-[0.2em] leading-none">Your Recorded Message Statement</p>
+                                    <p className="text-gray-300 text-[10px] uppercase font-black tracking-[0.2em] leading-none">Your Message</p>
                                 </div>
                                 <div className="bg-gray-50/50 rounded-[2rem] p-8 border border-gray-50 relative group-hover:bg-white group-hover:border-emerald-50 transition-colors">
                                     <p className="text-gray-700 font-medium italic text-xl leading-relaxed">"{inquiry.message}"</p>
                                     <div className="mt-6 flex justify-end">
-                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Module: Inquiries v1.0</span>
+                                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Messaging System</span>
                                     </div>
                                 </div>
                             </div>

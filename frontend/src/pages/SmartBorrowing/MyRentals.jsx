@@ -45,15 +45,15 @@ function MyRentals() {
         <div className="bg-white">
             <div className="flex flex-col md:flex-row items-center justify-between mb-12">
                 <div>
-                   <h1 className="text-4xl font-display font-black text-gray-900 mb-1 tracking-tight">Lifecycle Administration</h1>
+                   <h1 className="text-4xl font-display font-black text-gray-900 mb-1 tracking-tight">My Rentals</h1>
                    <div className="flex items-center gap-2 mt-2">
                     <CheckCircle2 size={14} className="text-emerald-500" />
-                    <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] leading-none">Institutional Asset Tracking</p>
+                    <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] leading-none">Track your rented items</p>
                    </div>
                 </div>
                 <Link to="/buyer/items" className="mt-6 md:mt-0 bg-gray-900 text-white font-black px-8 py-4 rounded-2xl shadow-xl hover:bg-emerald-600 transition-all flex items-center gap-3 uppercase tracking-widest text-[10px]">
                    <Plus size={16} />
-                   Request New Allocation
+                   Rent Something New
                 </Link>
             </div>
 
@@ -66,8 +66,8 @@ function MyRentals() {
                     <div className="w-20 h-20 bg-white rounded-[2rem] shadow-sm flex items-center justify-center mx-auto mb-8">
                         <Inbox size={40} strokeWidth={1.5} className="text-gray-300" />
                     </div>
-                    <h2 className="text-2xl font-display font-black text-gray-900 mb-2 tracking-tight">Records Empty</h2>
-                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">No active or pending rental agreements found in your profile Registry.</p>
+                    <h2 className="text-2xl font-display font-black text-gray-900 mb-2 tracking-tight">No Rentals Yet</h2>
+                    <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">You haven't rented any items yet. Browse the marketplace to get started!</p>
                 </motion.div>
             ) : (
                 <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 gap-8">
@@ -87,12 +87,12 @@ function MyRentals() {
                                               <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md uppercase tracking-widest">ID: {rental._id.slice(-6)}</span>
                                             </div>
                                             <h2 className="text-3xl font-display font-black text-gray-900 leading-tight tracking-tight">
-                                                {rental.item?.title || "Unknown Security Asset"}
+                                                {rental.item?.title || "Unknown Item"}
                                             </h2>
                                             <div className="flex items-center gap-3 mt-4">
                                                 <Calendar size={14} className="text-gray-400" />
                                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                                    Effective: {new Date(rental.dates?.startDate).toLocaleDateString()} — Expiration: {new Date(rental.dates?.endDate).toLocaleDateString()}
+                                                    From: {new Date(rental.dates?.startDate).toLocaleDateString()} — To: {new Date(rental.dates?.endDate).toLocaleDateString()}
                                                 </p>
                                             </div>
                                         </div>
@@ -109,7 +109,7 @@ function MyRentals() {
 
                                     {rental.notes && (
                                         <div className="mb-10 p-5 bg-gray-50 border-l-4 border-emerald-500 rounded-r-2xl">
-                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Coordinator Notes</p>
+                                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Notes</p>
                                             <p className="text-gray-600 text-xs italic font-medium">"{rental.notes}"</p>
                                         </div>
                                     )}
@@ -118,28 +118,28 @@ function MyRentals() {
                                         <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100">
                                             <div className="flex items-center gap-2 mb-2">
                                               <CreditCard size={12} className="text-gray-300" />
-                                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Allocation</p>
+                                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Payment</p>
                                             </div>
                                             <p className="font-display font-black text-gray-900 tracking-tight text-lg">{rental.paymentType}</p>
                                         </div>
                                         <div className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100">
                                             <div className="flex items-center gap-2 mb-2">
                                               <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
-                                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Contract</p>
+                                              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-0.5">Total Amount</p>
                                             </div>
                                             <p className="font-display font-black text-gray-900 tracking-tight text-lg">Rs. {rental.totalAmount}</p>
                                         </div>
                                         <div className="p-6 bg-emerald-50/20 rounded-2xl border border-emerald-100/50">
                                             <div className="flex items-center gap-2 mb-2">
                                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                              <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest leading-none mt-0.5">Settled</p>
+                                              <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest leading-none mt-0.5">Paid</p>
                                             </div>
                                             <p className="font-display font-black text-emerald-600 tracking-tight text-lg">Rs. {rental.paidAmount}</p>
                                         </div>
                                         <div className="p-6 bg-amber-50/20 rounded-2xl border border-amber-100/50">
                                             <div className="flex items-center gap-2 mb-2">
                                               <Clock size={12} className="text-amber-400" />
-                                              <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest leading-none mt-0.5">Debit Dues</p>
+                                              <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest leading-none mt-0.5">Amount Due</p>
                                             </div>
                                             <p className="font-display font-black text-amber-600 tracking-tight text-lg">Rs. {rental.remainingAmount}</p>
                                         </div>
@@ -153,7 +153,7 @@ function MyRentals() {
                                             className="bg-gray-900 hover:bg-emerald-600 text-white font-black text-center text-[10px] py-5 rounded-2xl transition-all shadow-xl shadow-gray-900/10 active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center gap-2"
                                         >
                                             <CreditCard size={16} />
-                                            Reconcile Dues
+                                            Pay Now
                                         </Link>
                                     )}
 
@@ -163,7 +163,7 @@ function MyRentals() {
                                             className="bg-white text-gray-900 hover:bg-gray-50 font-black text-center text-[10px] py-5 rounded-2xl transition-all border border-gray-200 active:scale-95 uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-sm"
                                         >
                                             <ExternalLink size={16} />
-                                            Submit Return
+                                            Return Item
                                         </Link>
                                     )}
                                 </div>

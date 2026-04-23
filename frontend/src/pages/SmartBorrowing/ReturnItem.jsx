@@ -95,10 +95,10 @@ function ReturnItem() {
          <div className="w-20 h-20 bg-gray-50 text-gray-900 border border-gray-100 rounded-[2.2rem] flex items-center justify-center mx-auto mb-8 shadow-inner">
            <PackageCheck size={36} strokeWidth={2.5} />
          </div>
-         <h1 className="text-4xl md:text-6xl font-display font-black text-gray-900 mb-2 tracking-tighter">Terminate Lease Agreement</h1>
+         <h1 className="text-4xl md:text-6xl font-display font-black text-gray-900 mb-2 tracking-tighter">Return Item</h1>
          <div className="flex items-center justify-center gap-3 mt-4 text-gray-400">
             <ShieldCheck size={14} className="text-emerald-500" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] leading-none">Asset Verification & Handoff Checklist</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] leading-none">Return Checklist</p>
          </div>
       </motion.div>
 
@@ -111,11 +111,11 @@ function ReturnItem() {
              <div className="space-y-8">
                 <div className="flex items-center gap-4 border-b border-gray-50 pb-6 uppercase">
                    <div className="w-1.5 h-6 bg-emerald-600 rounded-full" />
-                   <h2 className="text-lg font-display font-black text-gray-900 tracking-tight">Contract Overview</h2>
+                   <h2 className="text-lg font-display font-black text-gray-900 tracking-tight">Rental Details</h2>
                 </div>
                 <div className="bg-gray-50/50 rounded-[2rem] p-8 space-y-6 border border-gray-100 shadow-inner">
                    <div className="flex justify-between items-center">
-                      <span className="text-gray-400 font-black text-[9px] uppercase tracking-widest">Asset Serial</span>
+                      <span className="text-gray-400 font-black text-[9px] uppercase tracking-widest">Item Name</span>
                       <span className="font-display font-black text-gray-900 text-lg tracking-tight leading-none">{rental.item?.title}</span>
                    </div>
                    <div className="flex justify-between items-center border-t border-gray-100 pt-6">
@@ -136,7 +136,7 @@ function ReturnItem() {
              <div className="space-y-8">
                 <div className="flex items-center gap-4 border-b border-gray-50 pb-6 uppercase">
                    <div className="w-1.5 h-6 bg-gray-900 rounded-full" />
-                   <h2 className="text-lg font-display font-black text-gray-900 tracking-tight">Audit Status</h2>
+                   <h2 className="text-lg font-display font-black text-gray-900 tracking-tight">Payment Status</h2>
                 </div>
                 <div className="bg-gray-900 text-white rounded-[2rem] p-10 space-y-6 shadow-2xl shadow-gray-900/20 relative overflow-hidden">
                    <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/2" />
@@ -150,9 +150,9 @@ function ReturnItem() {
                    <div className="relative z-10 pt-8 mt-6 border-t border-white/5">
                       <div className="flex items-center gap-2 mb-4">
                         <ShieldCheck size={14} className="text-orange-400" />
-                        <p className="text-orange-400 font-black uppercase tracking-[0.3em] text-[9px] leading-none mt-0.5">Verified Liquidity Remaining</p>
+                        <p className="text-orange-400 font-black uppercase tracking-[0.3em] text-[9px] leading-none mt-0.5">Amount Remaining</p>
                       </div>
-                      <p className="text-5xl font-display font-black tracking-tighter leading-none">{rental.remainingAmount > 0 ? `Rs. ${rental.remainingAmount}` : "ALIGNED 0.0"}</p>
+                      <p className="text-5xl font-display font-black tracking-tighter leading-none">{rental.remainingAmount > 0 ? `Rs. ${rental.remainingAmount}` : "Paid"}</p>
                    </div>
                 </div>
              </div>
@@ -169,7 +169,7 @@ function ReturnItem() {
                    />
                 </div>
                 <div>
-                   <h3 className="text-xl font-display font-black text-gray-900 group-hover:text-emerald-700 transition-colors uppercase tracking-tight leading-none mb-3 underline decoration-gray-200 underline-offset-8">Physical Condition Attestation</h3>
+                   <h3 className="text-xl font-display font-black text-gray-900 group-hover:text-emerald-700 transition-colors uppercase tracking-tight leading-none mb-3 underline decoration-gray-200 underline-offset-8">Confirm Item Condition</h3>
                    <p className="text-gray-400 font-bold text-[13px] mt-4 leading-relaxed max-w-2xl px-6 py-4 bg-white border border-gray-50 rounded-2xl border-l-[6px] border-l-emerald-500 italic">
                      By initiating this termination request, you officially declare that the asset is being surrendered in its recorded physical state without undisclosed damage or operational failure.
                    </p>
@@ -208,7 +208,7 @@ function ReturnItem() {
             disabled={returned || !confirmed}
             className="w-full bg-gray-900 hover:bg-emerald-600 text-white font-display font-black text-2xl py-10 rounded-[3rem] shadow-2xl shadow-gray-900/10 active:scale-95 transition-all disabled:opacity-30 disabled:scale-100 uppercase tracking-[0.2em] flex items-center justify-center gap-4 group/btn"
           >
-             {returned ? "Termination Logged" : "Authorize Final Release"}
+             {returned ? "Termination Logged" : "Confirm Return"}
              <ChevronRight size={32} className="group-hover/btn:translate-x-2 transition-transform" strokeWidth={3} />
           </button>
           

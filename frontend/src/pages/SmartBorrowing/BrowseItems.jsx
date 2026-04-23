@@ -57,10 +57,10 @@ function BrowseItems() {
             >
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10">
                     <div>
-                       <h1 className="text-3xl font-display font-black text-gray-900 mb-1 tracking-tight">Advanced Inventory Search</h1>
+                       <h1 className="text-3xl font-display font-black text-gray-900 mb-1 tracking-tight">Find Student Items</h1>
                        <div className="flex items-center gap-3 mt-2">
                         <FileSearch size={14} className="text-emerald-500" />
-                        <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] leading-none">Global Network Indexing</p>
+                        <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] leading-none">Student Marketplace</p>
                        </div>
                     </div>
                     
@@ -69,7 +69,7 @@ function BrowseItems() {
                         className="flex items-center gap-2 text-[10px] font-black text-gray-500 hover:text-emerald-600 bg-white border border-gray-100 px-6 py-3 rounded-xl transition-all shadow-sm active:scale-95 uppercase tracking-[0.2em]"
                     >
                         <RotateCcw size={14} strokeWidth={3} />
-                        Clear Registry Filters
+                        Clear Filters
                     </button>
                 </div>
 
@@ -80,7 +80,7 @@ function BrowseItems() {
                         </div>
                         <input
                             type="text"
-                            placeholder="Identify asset by keyword..."
+                            placeholder="Search for items..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full bg-white border border-gray-200 rounded-2xl pl-16 pr-6 py-4.5 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold text-gray-700 placeholder:text-gray-300"
@@ -97,7 +97,7 @@ function BrowseItems() {
                             className="w-full bg-white border border-gray-200 rounded-2xl pl-16 pr-6 py-4.5 outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold text-gray-700 appearance-none"
                         >
                             {categories.map((cat, index) => (
-                                <option key={index} value={cat}>{cat === 'All' ? 'Select All Modules' : cat}</option>
+                                <option key={index} value={cat}>{cat === 'All' ? 'All Categories' : cat}</option>
                             ))}
                         </select>
                     </div>
@@ -106,7 +106,7 @@ function BrowseItems() {
                         <label className={`flex items-center justify-between h-full rounded-2xl border-2 px-6 py-4.5 cursor-pointer transition-all ${emergencyOnly ? 'bg-red-50 border-red-500 text-red-700' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-300'}`}>
                             <div className="flex items-center gap-3">
                                 <AlertTriangle size={18} className={emergencyOnly ? "text-red-600" : "text-gray-400"} />
-                                <span className="font-black uppercase tracking-widest text-[10px]">Urgent Assets Only</span>
+                                <span className="font-black uppercase tracking-widest text-[10px]">Emergency Items</span>
                             </div>
                             <input
                                 type="checkbox"
@@ -122,7 +122,7 @@ function BrowseItems() {
             {loading && (
                 <div className="flex flex-col items-center justify-center py-32 space-y-6">
                     <div className="animate-spin rounded-full h-14 w-14 border-[3px] border-gray-100 border-t-emerald-600"></div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Syncing Repository Data...</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Loading items...</p>
                 </div>
             )}
 
