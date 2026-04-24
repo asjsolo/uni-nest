@@ -1,9 +1,44 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { protect } from '../middleware/authMiddleware.js';
 import Booking from '../models/Booking.js';
 import Item from '../models/Item.js';
 
 const router = express.Router();
+
+// @route   GET /api/bookings/summary/:userId
+// @desc    Public rental summary for a user
+router.get('/summary/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: 'Invalid user id' });
+    }
+    const uid = new mongoose.Types.ObjectId(userId);
+    const completedStatuses = ['completed', 'returned'];
+
+    const [completedAsLender, completedAsBorrower, itemsListed, activeAsLender, activeAsBorrower] =
+      await Promise.all([
+        Booking.countDocuments({ lender: uid, status: { $in: completedStatuses } }),
+        Booking.countDocuments({ borrower: uid, status: { $in: completedStatuses } }),
+        Item.countDocuments({ owner: uid }),
+        Booking.countDocuments({ lender: uid, status: { $in: ['approved', 'active'] } }),
+        Booking.countDocuments({ borrower: uid, status: { $in: ['approved', 'active'] } }),
+      ]);
+
+    res.json({
+      completedAsLender,
+      completedAsBorrower,
+      totalCompleted: completedAsLender + completedAsBorrower,
+      activeAsLender,
+      activeAsBorrower,
+      itemsListed,
+    });
+  } catch (error) {
+    console.error('Error fetching booking summary:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // @route   POST /api/bookings/create
 // @desc    Create a new rental booking request

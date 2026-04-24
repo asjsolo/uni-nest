@@ -91,6 +91,21 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// @route   GET /api/auth/user/:userId
+// @desc    Public user info (safe fields only)
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select(
+      'name email role createdAt'
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // @route   GET /api/users/profile
 // @desc    Get user profile
 router.get('/profile', protect, async (req, res) => {

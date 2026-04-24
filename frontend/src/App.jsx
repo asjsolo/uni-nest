@@ -12,6 +12,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import MainDashboard from './pages/MainDashboard';
 import ItemDetail from './pages/ItemDetail';
 import UserProfile from './pages/UserProfile';
+import PublicUserProfile from './pages/PublicUserProfile';
 import './App.css';
 
 const PrivateRoute = ({ children, allowedRole }) => {
@@ -109,6 +110,15 @@ function App() {
             element={
               <PrivateRoute>
                 <UserProfile />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/user/:userId"
+            element={
+              <PrivateRoute>
+                <PublicUserProfile />
               </PrivateRoute>
             }
           />

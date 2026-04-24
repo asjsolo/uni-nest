@@ -186,7 +186,29 @@ const BrowseItems = () => {
                           </div>
                           <p className="item-description">{item.description}</p>
                           <div className="item-meta">
-                            <span className="item-meta-chip">👤 {item.owner?.fullname || 'Unknown'}</span>
+                            <button
+                              type="button"
+                              className="item-meta-chip"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (item.owner?._id) navigate(`/user/${item.owner._id}`);
+                              }}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              disabled={!item.owner?._id}
+                              title={item.owner?._id ? 'View user profile' : ''}
+                              style={{
+                                cursor: item.owner?._id ? 'pointer' : 'default',
+                                background: 'rgba(124,58,237,0.12)',
+                                border: '1px solid rgba(124,58,237,0.3)',
+                                color: '#c4b5fd',
+                                fontFamily: 'inherit',
+                                fontWeight: 600,
+                              }}
+                            >
+                              👤 {item.owner?.fullname || item.owner?.name || 'Unknown'}
+                              {item.owner?._id ? ' ↗' : ''}
+                            </button>
                             <span className="item-meta-chip">📍 {item.pickupLocation}</span>
                             <span className="item-meta-chip">📅 {item.minRentalDays}–{item.maxRentalDays} days</span>
                           </div>
