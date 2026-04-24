@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import userRoutes from './routes/userRoutes.js';
 import inventoryRoutes from './routes/inventoryRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import { checkOverdueBookings } from './controllers/bookingController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +53,9 @@ mongoose
     // Start the Express server once the database is connected
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
+      // Run overdue check immediately on startup and then every 1 minute
+      checkOverdueBookings();
+      setInterval(checkOverdueBookings, 60 * 1000);
     });
   })
   .catch((err) => {

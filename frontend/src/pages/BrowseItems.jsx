@@ -88,14 +88,11 @@ const BrowseItems = () => {
             <a href="#" className="nav-item active">
               <span className="nav-icon">🔍</span> Browse Items
             </a>
-            <a href="#" className="nav-item">
+            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); navigate('/borrower-dashboard', { state: { activeTab: 'My Requests' } }); }}>
               <span className="nav-icon">📋</span> My Requests
             </a>
-            <a href="#" className="nav-item">
+            <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); navigate('/borrower-dashboard', { state: { activeTab: 'Messages' } }); }}>
               <span className="nav-icon">💬</span> Messages
-            </a>
-            <a href="#" className="nav-item">
-              <span className="nav-icon">⚙️</span> Settings
             </a>
           </nav>
 
