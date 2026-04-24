@@ -10,26 +10,46 @@ const UserProfile = () => {
   const [profile, setProfile] = useState(user || null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [lendingHistory, setLendingHistory] = useState([]);
+  const [borrowingHistory, setBorrowingHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [trust, setTrust] = useState(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const load = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/auth/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProfile(res.data);
+        const [profileRes, lendingRes, borrowingRes, trustRes] = await Promise.all([
+          axios.get('http://localhost:5000/api/auth/profile', { headers }),
+          axios
+            .get('http://localhost:5000/api/bookings/lender-bookings', { headers })
+            .catch(() => ({ data: [] })),
+          axios
+            .get('http://localhost:5000/api/bookings/my-requests', { headers })
+            .catch(() => ({ data: [] })),
+          axios
+            .get('http://localhost:5000/api/item-reviews/trust-score/me', { headers })
+            .catch(() => ({ data: null })),
+        ]);
+        setProfile(profileRes.data);
+        setLendingHistory(Array.isArray(lendingRes.data) ? lendingRes.data : []);
+        setBorrowingHistory(Array.isArray(borrowingRes.data) ? borrowingRes.data : []);
+        setTrust(trustRes.data || null);
       } catch (err) {
         setError(err.response?.data?.message || 'Could not load profile.');
       } finally {
         setLoading(false);
+        setHistoryLoading(false);
       }
     };
-    fetchProfile();
+    load();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -58,7 +78,15 @@ const UserProfile = () => {
       <div className="page-bg" />
       <div
         className="auth-page"
-        style={{ justifyContent: 'center', alignItems: 'center' }}
+        style={{
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          flexDirection: 'column',
+          gap: '20px',
+          padding: '24px',
+          overflowY: 'auto',
+          boxSizing: 'border-box',
+        }}
       >
         <div
           className="auth-card glass-card fade-up"
@@ -196,8 +224,378 @@ const UserProfile = () => {
             </>
           )}
         </div>
+
+        {!loading && !error && (
+          <>
+            {trust && <TrustScoreCard trust={trust} />}
+            <HistoryTable
+              title="🏷️ Lending History"
+              subtitle="Items you have lent to other students."
+              rows={lendingHistory}
+              role="lender"
+              loading={historyLoading}
+            />
+            <HistoryTable
+              title="🎒 Borrowing History"
+              subtitle="Items you have borrowed from other students."
+              rows={borrowingHistory}
+              role="borrower"
+              loading={historyLoading}
+            />
+          </>
+        )}
       </div>
     </>
+  );
+};
+
+const TIER_STYLES = {
+  gold: {
+    gradient: 'linear-gradient(135deg, #f59e0b, #b45309)',
+    glow: '0 8px 28px rgba(245, 158, 11, 0.45)',
+    ring: 'rgba(245, 158, 11, 0.5)',
+    icon: '🏆',
+  },
+  silver: {
+    gradient: 'linear-gradient(135deg, #cbd5e1, #64748b)',
+    glow: '0 8px 28px rgba(148, 163, 184, 0.35)',
+    ring: 'rgba(203, 213, 225, 0.45)',
+    icon: '🥈',
+  },
+  bronze: {
+    gradient: 'linear-gradient(135deg, #d97706, #78350f)',
+    glow: '0 8px 28px rgba(180, 83, 9, 0.4)',
+    ring: 'rgba(217, 119, 6, 0.5)',
+    icon: '🥉',
+  },
+  new: {
+    gradient: 'linear-gradient(135deg, #475569, #1e293b)',
+    glow: '0 8px 28px rgba(71, 85, 105, 0.35)',
+    ring: 'rgba(148, 163, 184, 0.3)',
+    icon: '🌱',
+  },
+};
+
+const TrustScoreCard = ({ trust }) => {
+  const tier = TIER_STYLES[trust.tier] || TIER_STYLES.new;
+  const pct = Math.max(0, Math.min(100, trust.trustScore));
+
+  return (
+    <div
+      className="glass-card fade-up"
+      style={{
+        width: '100%',
+        maxWidth: '620px',
+        padding: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '18px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '18px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <div
+          style={{
+            width: '88px',
+            height: '88px',
+            borderRadius: '50%',
+            background: tier.gradient,
+            boxShadow: tier.glow,
+            border: `2px solid ${tier.ring}`,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ fontSize: '1.6rem', lineHeight: 1 }}>{tier.icon}</div>
+          <div style={{ fontSize: '1.25rem', fontWeight: 800, lineHeight: 1, marginTop: '4px' }}>
+            {trust.trustScore}
+          </div>
+        </div>
+
+        <div style={{ flex: 1, minWidth: '200px', textAlign: 'left' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+              marginBottom: '4px',
+            }}
+          >
+            <h2
+              style={{
+                margin: 0,
+                fontSize: '1.1rem',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+              }}
+            >
+              Trust Score
+            </h2>
+            <span
+              style={{
+                padding: '3px 10px',
+                borderRadius: '99px',
+                background: tier.gradient,
+                color: 'white',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                border: `1px solid ${tier.ring}`,
+              }}
+            >
+              {trust.label}
+            </span>
+            {trust.isTrusted && (
+              <span
+                style={{
+                  padding: '3px 10px',
+                  borderRadius: '99px',
+                  background: 'rgba(16,185,129,0.15)',
+                  color: '#34d399',
+                  border: '1px solid rgba(16,185,129,0.35)',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                }}
+              >
+                ✓ Verified Trusted
+              </span>
+            )}
+          </div>
+          <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+            Built from item reviews, average rating, and completed rentals.
+          </p>
+
+          <div
+            style={{
+              marginTop: '10px',
+              height: '8px',
+              borderRadius: '99px',
+              background: 'rgba(255,255,255,0.08)',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${pct}%`,
+                background: tier.gradient,
+                transition: 'width 0.4s ease',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '10px',
+        }}
+      >
+        <TrustStat
+          label="Avg Rating"
+          value={trust.avgRating ? `${trust.avgRating.toFixed(1)} ★` : '—'}
+        />
+        <TrustStat label="Reviews" value={trust.reviewCount} />
+        <TrustStat label="Completed Rentals" value={trust.completedBookings} />
+      </div>
+
+      <div
+        style={{
+          fontSize: '0.75rem',
+          color: 'var(--text-muted)',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '10px',
+          padding: '10px 12px',
+          lineHeight: 1.5,
+          textAlign: 'left',
+        }}
+      >
+        <strong style={{ color: 'var(--text-secondary)' }}>How it's calculated:</strong>{' '}
+        avg rating × 20, weighted by review confidence (5+ reviews = full weight), plus up to +20
+        for completed rentals. Gold requires score ≥ 80 with 5+ reviews and 5+ rentals.
+      </div>
+    </div>
+  );
+};
+
+const TrustStat = ({ label, value }) => (
+  <div
+    style={{
+      padding: '10px 12px',
+      background: 'rgba(255,255,255,0.04)',
+      border: '1px solid rgba(255,255,255,0.08)',
+      borderRadius: '10px',
+      textAlign: 'center',
+    }}
+  >
+    <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+      {value}
+    </div>
+    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+      {label}
+    </div>
+  </div>
+);
+
+const StatusPill = ({ status }) => {
+  const map = {
+    pending: { bg: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: 'rgba(251,191,36,0.35)' },
+    approved: { bg: 'rgba(59,130,246,0.15)', color: '#93c5fd', border: 'rgba(59,130,246,0.35)' },
+    rejected: { bg: 'rgba(248,113,113,0.15)', color: '#f87171', border: 'rgba(248,113,113,0.35)' },
+    active: { bg: 'rgba(124,58,237,0.15)', color: '#c4b5fd', border: 'rgba(124,58,237,0.35)' },
+    returned: { bg: 'rgba(14,165,233,0.15)', color: '#7dd3fc', border: 'rgba(14,165,233,0.35)' },
+    completed: { bg: 'rgba(16,185,129,0.15)', color: '#34d399', border: 'rgba(16,185,129,0.35)' },
+    overdue: { bg: 'rgba(239,68,68,0.15)', color: '#fca5a5', border: 'rgba(239,68,68,0.35)' },
+  };
+  const s = map[status] || { bg: 'rgba(255,255,255,0.08)', color: '#e2e8f0', border: 'rgba(255,255,255,0.15)' };
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        padding: '3px 10px',
+        borderRadius: '99px',
+        background: s.bg,
+        color: s.color,
+        border: `1px solid ${s.border}`,
+        fontSize: '0.72rem',
+        fontWeight: 600,
+        textTransform: 'capitalize',
+      }}
+    >
+      {status || 'unknown'}
+    </span>
+  );
+};
+
+const formatDate = (d) =>
+  d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+
+const HistoryTable = ({ title, subtitle, rows, role, loading }) => {
+  const counterpartyLabel = role === 'lender' ? 'Borrower' : 'Lender';
+
+  const th = {
+    textAlign: 'left',
+    padding: '10px 12px',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+    borderBottom: '1px solid rgba(255,255,255,0.1)',
+    whiteSpace: 'nowrap',
+  };
+
+  const td = {
+    padding: '12px',
+    fontSize: '0.85rem',
+    color: 'var(--text-secondary)',
+    borderBottom: '1px solid rgba(255,255,255,0.06)',
+    verticalAlign: 'middle',
+  };
+
+  const renderBody = () => {
+    if (loading) {
+      return (
+        <tr>
+          <td colSpan={5} style={{ ...td, textAlign: 'center', color: 'var(--text-muted)' }}>
+            Loading...
+          </td>
+        </tr>
+      );
+    }
+    if (!rows || rows.length === 0) {
+      return (
+        <tr>
+          <td colSpan={5} style={{ ...td, textAlign: 'center', color: 'var(--text-muted)' }}>
+            No records yet.
+          </td>
+        </tr>
+      );
+    }
+    return rows.map((r) => {
+      const counterparty = role === 'lender' ? r.borrower : r.lender;
+      const counterpartyName =
+        counterparty?.fullname || counterparty?.name || '—';
+      return (
+        <tr key={r._id}>
+          <td style={{ ...td, color: 'var(--text-primary)', fontWeight: 600 }}>
+            {r.item?.name || 'Unknown item'}
+          </td>
+          <td style={td}>{counterpartyName}</td>
+          <td style={td}>{formatDate(r.startDate)}</td>
+          <td style={td}>{formatDate(r.dueDate || r.endDate)}</td>
+          <td style={td}>
+            <StatusPill status={r.status} />
+          </td>
+        </tr>
+      );
+    });
+  };
+
+  return (
+    <div
+      className="glass-card fade-up"
+      style={{
+        width: '100%',
+        maxWidth: '900px',
+        padding: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '14px',
+      }}
+    >
+      <div>
+        <h2
+          style={{
+            margin: 0,
+            fontSize: '1.05rem',
+            fontWeight: 700,
+            color: 'var(--text-primary)',
+          }}
+        >
+          {title}
+        </h2>
+        <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          {subtitle}
+        </p>
+      </div>
+
+      <div style={{ overflowX: 'auto' }}>
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            minWidth: '600px',
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={th}>Item</th>
+              <th style={th}>{counterpartyLabel}</th>
+              <th style={th}>Start</th>
+              <th style={th}>Due / End</th>
+              <th style={th}>Status</th>
+            </tr>
+          </thead>
+          <tbody>{renderBody()}</tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 

@@ -8,6 +8,7 @@ import userRoutes from './routes/userRoutes.js';
 import inventoryRoutes from './routes/inventoryRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import platformReviewRoutes from './routes/platformReviewRoutes.js';
+import itemReviewRoutes from './routes/itemReviewRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +40,7 @@ app.use('/api/auth', userRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/platform-reviews', platformReviewRoutes);
+app.use('/api/item-reviews', itemReviewRoutes);
 import adminRoutes from './routes/adminRoutes.js';
 app.use('/api/admin', adminRoutes);
 

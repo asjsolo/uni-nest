@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ItemReviews from './ItemReviews';
+import { AuthContext } from '../context/AuthContext';
 import './Dashboard.css';
 
 const ItemDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -176,8 +179,17 @@ const ItemDetail = () => {
                 </button>
               </div>
             </div>
-            
+
           </div>
+
+          <ItemReviews
+            itemId={item._id}
+            isOwner={
+              user?._id &&
+              (item.owner?._id || item.owner) &&
+              String(user._id) === String(item.owner?._id || item.owner)
+            }
+          />
         </main>
       </div>
     </>
