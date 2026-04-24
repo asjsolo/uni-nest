@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import userRoutes from './routes/userRoutes.js';
 import inventoryRoutes from './routes/inventoryRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import platformReviewRoutes from './routes/platformReviewRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,7 @@ app.use('/api/auth', userRoutes);
 // Scaffolded module routes mapping
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/platform-reviews', platformReviewRoutes);
 import adminRoutes from './routes/adminRoutes.js';
 app.use('/api/admin', adminRoutes);
 

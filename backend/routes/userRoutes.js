@@ -39,6 +39,8 @@ router.post('/register', async (req, res) => {
       name: fullname,
       email,
       password: hashedPassword,
+      phonenumber,
+      campusRegistrationNumber,
     });
 
     if (user) {
@@ -46,6 +48,8 @@ router.post('/register', async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phonenumber: user.phonenumber,
+        campusRegistrationNumber: user.campusRegistrationNumber,
         role: user.role,
         token: generateToken(user._id),
       });
@@ -73,6 +77,8 @@ router.post('/login', async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phonenumber: user.phonenumber,
+        campusRegistrationNumber: user.campusRegistrationNumber,
         role: user.role,
         token: generateToken(user._id),
       });
