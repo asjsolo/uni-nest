@@ -24,7 +24,7 @@ function Navbar() {
             <span className="text-white font-display font-bold text-lg">U</span>
           </div>
           <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-emerald-800 to-green-700 bg-clip-text text-transparent">
-            UNI NEST
+            UNI NESTyyy
           </h1>
         </Link>
 
