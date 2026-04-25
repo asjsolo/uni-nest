@@ -1,0 +1,495 @@
+{
+  "info": {
+    "name": "UniNest — Profile, Platform Reviews, Trust Score, History",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "👤 User Profile",
+      "item": [
+        {
+          "name": "Register User A",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullname\": \"Alice Tester\",\n  \"email\": \"IT11111111@my.sliit.lk\",\n  \"phonenumber\": \"0771111111\",\n  \"password\": \"pass1234\",\n  \"campusRegistrationNumber\": \"IT11111111\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const r = pm.response.json();",
+              "if (r.token) pm.environment.set('tokenA', r.token);",
+              "if (r._id) pm.environment.set('userIdA', r._id);",
+              "pm.test('Registered or already exists', () => pm.expect([201, 400]).to.include(pm.response.code));",
+              "if (pm.response.code === 201) {",
+              "  pm.test('returns token', () => pm.expect(r.token).to.be.a('string'));",
+              "  pm.test('phone persisted', () => pm.expect(r.phonenumber).to.eql('0771111111'));",
+              "  pm.test('reg no. persisted', () => pm.expect(r.campusRegistrationNumber).to.eql('IT11111111'));",
+              "}"
+            ]}
+          }]
+        },
+        {
+          "name": "Register User B",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullname\": \"Bob Borrower\",\n  \"email\": \"IT22222222@my.sliit.lk\",\n  \"phonenumber\": \"0772222222\",\n  \"password\": \"pass1234\",\n  \"campusRegistrationNumber\": \"IT22222222\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const r = pm.response.json();",
+              "if (r.token) pm.environment.set('tokenB', r.token);",
+              "if (r._id) pm.environment.set('userIdB', r._id);",
+              "pm.test('Registered or already exists', () => pm.expect([201, 400]).to.include(pm.response.code));"
+            ]}
+          }]
+        },
+        {
+          "name": "Login User A",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"IT11111111@my.sliit.lk\",\n  \"password\": \"pass1234\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200 OK', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.environment.set('tokenA', r.token);",
+              "pm.environment.set('userIdA', r._id);",
+              "pm.test('returns token', () => pm.expect(r.token).to.be.a('string'));"
+            ]}
+          }]
+        },
+        {
+          "name": "Login User B",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"IT22222222@my.sliit.lk\",\n  \"password\": \"pass1234\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200 OK', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.environment.set('tokenB', r.token);",
+              "pm.environment.set('userIdB', r._id);"
+            ]}
+          }]
+        },
+        {
+          "name": "Login — wrong password (should 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"IT11111111@my.sliit.lk\",\n  \"password\": \"wrong-pass\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('401 unauthorized', () => pm.expect(pm.response.code).to.eql(401));"
+            ]}
+          }]
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": "{{baseUrl}}/api/auth/profile"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200 OK', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.test('exposes safe fields', () => {",
+              "  pm.expect(r).to.have.property('email');",
+              "  pm.expect(r).to.have.property('phonenumber');",
+              "  pm.expect(r).to.have.property('campusRegistrationNumber');",
+              "});",
+              "pm.test('password not leaked', () => pm.expect(r.password).to.be.undefined);"
+            ]}
+          }]
+        },
+        {
+          "name": "Get My Profile — no token (should 401)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/auth/profile" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('401', () => pm.expect(pm.response.code).to.eql(401));"
+            ]}
+          }]
+        },
+        {
+          "name": "Get Public User Profile (User B)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/auth/user/{{userIdB}}" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.test('safe fields only', () => {",
+              "  pm.expect(r).to.have.property('name');",
+              "  pm.expect(r).to.have.property('email');",
+              "  pm.expect(r).to.have.property('createdAt');",
+              "  pm.expect(r.password).to.be.undefined;",
+              "});"
+            ]}
+          }]
+        },
+        {
+          "name": "Get Public User — invalid id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/auth/user/not-a-real-id" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('error code', () => pm.expect([400, 404, 500]).to.include(pm.response.code));"
+            ]}
+          }]
+        }
+      ]
+    },
+    {
+      "name": "⭐ Platform Reviews",
+      "item": [
+        {
+          "name": "List Platform Reviews",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/platform-reviews" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.test('shape: reviews + stats', () => {",
+              "  pm.expect(r).to.have.property('reviews');",
+              "  pm.expect(r.reviews).to.be.an('array');",
+              "  pm.expect(r).to.have.property('stats');",
+              "  pm.expect(r.stats).to.have.property('count');",
+              "  pm.expect(r.stats).to.have.property('average');",
+              "});"
+            ]}
+          }]
+        },
+        {
+          "name": "Submit Platform Review (User A)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/platform-reviews",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Great platform for campus rentals!\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('201', () => pm.expect(pm.response.code).to.eql(201));",
+              "const r = pm.response.json();",
+              "pm.environment.set('platformReviewId', r._id);",
+              "pm.test('rating saved', () => pm.expect(r.rating).to.eql(5));",
+              "pm.test('reviewerName cached', () => pm.expect(r.reviewerName).to.be.a('string'));"
+            ]}
+          }]
+        },
+        {
+          "name": "Submit — no auth (should 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/platform-reviews",
+            "body": { "mode": "raw", "raw": "{\"rating\":5,\"comment\":\"unauth\"}" }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('401', () => pm.expect(pm.response.code).to.eql(401));"
+            ]}
+          }]
+        },
+        {
+          "name": "Submit — invalid rating (should 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/platform-reviews",
+            "body": { "mode": "raw", "raw": "{\"rating\":7,\"comment\":\"too high\"}" }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('400', () => pm.expect(pm.response.code).to.eql(400));",
+              "pm.test('message about rating', () => pm.expect(pm.response.json().message).to.match(/rating/i));"
+            ]}
+          }]
+        },
+        {
+          "name": "Submit — empty comment (should 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/platform-reviews",
+            "body": { "mode": "raw", "raw": "{\"rating\":4,\"comment\":\"\"}" }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('400', () => pm.expect(pm.response.code).to.eql(400));"
+            ]}
+          }]
+        },
+        {
+          "name": "Update Platform Review (own)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/platform-reviews/{{platformReviewId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Updated: still solid.\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "pm.test('rating updated', () => pm.expect(pm.response.json().rating).to.eql(4));"
+            ]}
+          }]
+        },
+        {
+          "name": "Update — as User B (should 403)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/platform-reviews/{{platformReviewId}}",
+            "body": { "mode": "raw", "raw": "{\"rating\":1,\"comment\":\"hacked\"}" }
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('403', () => pm.expect(pm.response.code).to.eql(403));"
+            ]}
+          }]
+        },
+        {
+          "name": "Delete Platform Review (own)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": "{{baseUrl}}/api/platform-reviews/{{platformReviewId}}"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));"
+            ]}
+          }]
+        },
+        {
+          "name": "Delete already-deleted (should 404)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": "{{baseUrl}}/api/platform-reviews/{{platformReviewId}}"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('404', () => pm.expect(pm.response.code).to.eql(404));"
+            ]}
+          }]
+        }
+      ]
+    },
+    {
+      "name": "🏆 Trust Score",
+      "item": [
+        {
+          "name": "My Trust Score",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": "{{baseUrl}}/api/item-reviews/trust-score/me"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.test('full payload', () => {",
+              "  ['trustScore','avgRating','reviewCount','completedBookings','tier','label','isTrusted'].forEach(k => {",
+              "    pm.expect(r).to.have.property(k);",
+              "  });",
+              "});",
+              "pm.test('score in [0,100]', () => pm.expect(r.trustScore).to.be.within(0,100));",
+              "pm.test('valid tier', () => pm.expect(['gold','silver','bronze','new']).to.include(r.tier));"
+            ]}
+          }]
+        },
+        {
+          "name": "Public Trust Score (User B)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/item-reviews/trust-score/{{userIdB}}" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.test('label matches tier', () => {",
+              "  if (r.tier === 'gold') pm.expect(r.label).to.eql('Trusted User');",
+              "  if (r.tier === 'silver') pm.expect(r.label).to.eql('Silver Member');",
+              "  if (r.tier === 'bronze') pm.expect(r.label).to.eql('Bronze Member');",
+              "  if (r.tier === 'new') pm.expect(r.label).to.eql('New Member');",
+              "});"
+            ]}
+          }]
+        },
+        {
+          "name": "Trust Score — invalid id (should 400)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/item-reviews/trust-score/not-an-id" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('400', () => pm.expect(pm.response.code).to.eql(400));"
+            ]}
+          }]
+        },
+        {
+          "name": "Trust Score /me — no auth (should 401)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/item-reviews/trust-score/me" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('401', () => pm.expect(pm.response.code).to.eql(401));"
+            ]}
+          }]
+        }
+      ]
+    },
+    {
+      "name": "📊 Lending & Borrowing History",
+      "item": [
+        {
+          "name": "My Lending History",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenA}}" }],
+            "url": "{{baseUrl}}/api/bookings/lender-bookings"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "pm.test('returns array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+              "const arr = pm.response.json();",
+              "if (arr.length > 0) {",
+              "  pm.test('booking has expected shape', () => {",
+              "    const b = arr[0];",
+              "    pm.expect(b).to.have.property('item');",
+              "    pm.expect(b).to.have.property('status');",
+              "    pm.expect(b).to.have.property('startDate');",
+              "  });",
+              "}"
+            ]}
+          }]
+        },
+        {
+          "name": "My Borrowing History",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenB}}" }],
+            "url": "{{baseUrl}}/api/bookings/my-requests"
+          },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "pm.test('returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]}
+          }]
+        },
+        {
+          "name": "History — no auth (should 401)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/bookings/my-requests" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('401', () => pm.expect(pm.response.code).to.eql(401));"
+            ]}
+          }]
+        },
+        {
+          "name": "Booking Summary (User A)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/bookings/summary/{{userIdA}}" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('200', () => pm.expect(pm.response.code).to.eql(200));",
+              "const r = pm.response.json();",
+              "pm.test('all summary fields present', () => {",
+              "  ['completedAsLender','completedAsBorrower','totalCompleted','activeAsLender','activeAsBorrower','itemsListed'].forEach(k => {",
+              "    pm.expect(r).to.have.property(k);",
+              "    pm.expect(r[k]).to.be.a('number');",
+              "  });",
+              "});",
+              "pm.test('totalCompleted = sum of parts', () => {",
+              "  pm.expect(r.totalCompleted).to.eql(r.completedAsLender + r.completedAsBorrower);",
+              "});"
+            ]}
+          }]
+        },
+        {
+          "name": "Booking Summary — invalid id (should 400)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/bookings/summary/not-an-id" },
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "pm.test('400', () => pm.expect(pm.response.code).to.eql(400));"
+            ]}
+          }]
+        }
+      ]
+    }
+  ]
+}
