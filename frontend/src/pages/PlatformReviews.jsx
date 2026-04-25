@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 const API = 'http://localhost:5000/api/platform-reviews';
 
@@ -45,7 +46,21 @@ const StarDisplay = ({ value }) => (
   </span>
 );
 
+const smallBtn = (opts = {}) => ({
+  padding: '4px 10px',
+  fontSize: '0.72rem',
+  fontWeight: 600,
+  borderRadius: '8px',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+  border: '1px solid rgba(255,255,255,0.15)',
+  background: 'rgba(255,255,255,0.05)',
+  color: 'var(--text-secondary)',
+  ...opts,
+});
+
 const PlatformReviews = () => {
+  const { user } = useContext(AuthContext);
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState({ count: 0, average: 0 });
   const [rating, setRating] = useState(0);
@@ -54,6 +69,11 @@ const PlatformReviews = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [editingId, setEditingId] = useState(null);
+  const [editRating, setEditRating] = useState(0);
+  const [editComment, setEditComment] = useState('');
+  const [editError, setEditError] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchReviews = async () => {
     try {
@@ -76,20 +96,11 @@ const PlatformReviews = () => {
     setError('');
     setSuccess('');
 
-    if (!rating) {
-      setError('Please pick a star rating.');
-      return;
-    }
-    if (!comment.trim()) {
-      setError('Please write a short comment.');
-      return;
-    }
+    if (!rating) return setError('Please pick a star rating.');
+    if (!comment.trim()) return setError('Please write a short comment.');
 
     const token = localStorage.getItem('token');
-    if (!token) {
-      setError('You need to be signed in to leave a review.');
-      return;
-    }
+    if (!token) return setError('You need to be signed in to leave a review.');
 
     setSubmitting(true);
     try {
@@ -106,6 +117,57 @@ const PlatformReviews = () => {
       setError(err.response?.data?.message || 'Could not submit review.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const startEdit = (r) => {
+    setEditingId(r._id);
+    setEditRating(r.rating);
+    setEditComment(r.comment);
+    setEditError('');
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditError('');
+  };
+
+  const saveEdit = async (reviewId) => {
+    setEditError('');
+    if (!editRating) return setEditError('Please pick a star rating.');
+    if (!editComment.trim()) return setEditError('Please write a short comment.');
+
+    const token = localStorage.getItem('token');
+    if (!token) return setEditError('You must be signed in.');
+
+    setSavingEdit(true);
+    try {
+      await axios.put(
+        `${API}/${reviewId}`,
+        { rating: editRating, comment: editComment.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEditingId(null);
+      fetchReviews();
+    } catch (err) {
+      setEditError(err.response?.data?.message || 'Could not update review.');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const deleteReview = async (reviewId) => {
+    if (!window.confirm('Delete your review? This cannot be undone.')) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      await axios.delete(`${API}/${reviewId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (editingId === reviewId) setEditingId(null);
+      fetchReviews();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not delete review.');
     }
   };
 
@@ -274,51 +336,150 @@ const PlatformReviews = () => {
             No reviews yet — be the first to share your experience!
           </p>
         ) : (
-          reviews.map((r) => (
-            <div
-              key={r._id}
-              style={{
-                padding: '12px 14px',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
-                textAlign: 'left',
-              }}
-            >
+          reviews.map((r) => {
+            const isMine = user?._id && String(r.reviewer) === String(user._id);
+            const isEditing = editingId === r._id;
+            return (
               <div
+                key={r._id}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '8px',
-                  marginBottom: '6px',
+                  padding: '12px 14px',
+                  background: isMine ? 'rgba(124,58,237,0.08)' : 'rgba(255,255,255,0.04)',
+                  border: isMine
+                    ? '1px solid rgba(124,58,237,0.3)'
+                    : '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '12px',
+                  textAlign: 'left',
                 }}
               >
-                <strong
+                <div
                   style={{
-                    fontSize: '0.88rem',
-                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '8px',
+                    marginBottom: '6px',
+                    flexWrap: 'wrap',
                   }}
                 >
-                  {r.reviewerName || 'Student'}
-                </strong>
-                <StarDisplay value={r.rating} />
+                  <strong style={{ fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                    {r.reviewerName || 'Student'}
+                    {isMine && (
+                      <span
+                        style={{
+                          marginLeft: '8px',
+                          fontSize: '0.68rem',
+                          color: '#c4b5fd',
+                          fontWeight: 600,
+                          padding: '2px 8px',
+                          borderRadius: '99px',
+                          background: 'rgba(124,58,237,0.15)',
+                          border: '1px solid rgba(124,58,237,0.3)',
+                        }}
+                      >
+                        YOU
+                      </span>
+                    )}
+                  </strong>
+                  {isEditing ? (
+                    <StarInput value={editRating} onChange={setEditRating} />
+                  ) : (
+                    <StarDisplay value={r.rating} />
+                  )}
+                </div>
+
+                {isEditing ? (
+                  <>
+                    <textarea
+                      value={editComment}
+                      onChange={(e) => setEditComment(e.target.value)}
+                      maxLength={500}
+                      rows={3}
+                      className="form-input"
+                      style={{
+                        width: '100%',
+                        resize: 'vertical',
+                        fontFamily: 'inherit',
+                        fontSize: '0.88rem',
+                        padding: '10px',
+                        marginBottom: '8px',
+                      }}
+                    />
+                    {editError && (
+                      <div style={{ fontSize: '0.78rem', color: '#f87171', marginBottom: '8px' }}>
+                        ⚠️ {editError}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        disabled={savingEdit}
+                        onClick={() => saveEdit(r._id)}
+                        style={smallBtn({
+                          background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
+                          color: 'white',
+                          border: '1px solid rgba(124,58,237,0.4)',
+                        })}
+                      >
+                        {savingEdit ? 'Saving...' : 'Save'}
+                      </button>
+                      <button type="button" onClick={cancelEdit} style={smallBtn()}>
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p
+                      style={{
+                        margin: '0 0 6px',
+                        fontSize: '0.85rem',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {r.comment}
+                    </p>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '8px',
+                      }}
+                    >
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        {formatDate(r.createdAt)}
+                        {r.updatedAt && r.updatedAt !== r.createdAt ? ' (edited)' : ''}
+                      </span>
+                      {isMine && (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            type="button"
+                            onClick={() => startEdit(r)}
+                            style={smallBtn()}
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteReview(r._id)}
+                            style={smallBtn({
+                              color: '#f87171',
+                              borderColor: 'rgba(248,113,113,0.3)',
+                              background: 'rgba(248,113,113,0.08)',
+                            })}
+                          >
+                            🗑 Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
-              <p
-                style={{
-                  margin: '0 0 6px',
-                  fontSize: '0.85rem',
-                  color: 'var(--text-secondary)',
-                  lineHeight: 1.5,
-                }}
-              >
-                {r.comment}
-              </p>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                {formatDate(r.createdAt)}
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

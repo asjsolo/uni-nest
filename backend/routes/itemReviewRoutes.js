@@ -177,6 +177,78 @@ router.post('/item/:itemId', protect, async (req, res) => {
     }
 });
 
+// @route   PUT /api/item-reviews/:reviewId
+// @desc    Update your own item review
+router.put('/:reviewId', protect, async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+            return res.status(400).json({ message: 'Invalid review id' });
+        }
+
+        const review = await ItemReview.findById(reviewId);
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+
+        if (review.reviewer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'You can only edit your own review.' });
+        }
+
+        const { rating, comment } = req.body;
+
+        if (rating !== undefined) {
+            const numericRating = Number(rating);
+            if (
+                !numericRating ||
+                numericRating < 1 ||
+                numericRating > 5 ||
+                !Number.isFinite(numericRating)
+            ) {
+                return res
+                    .status(400)
+                    .json({ message: 'Rating must be a number between 1 and 5.' });
+            }
+            review.rating = numericRating;
+        }
+
+        if (comment !== undefined) {
+            if (!comment.trim()) {
+                return res.status(400).json({ message: 'Comment is required.' });
+            }
+            review.comment = comment.trim();
+        }
+
+        await review.save();
+        res.json(review);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// @route   DELETE /api/item-reviews/:reviewId
+// @desc    Delete your own item review
+router.delete('/:reviewId', protect, async (req, res) => {
+    try {
+        const { reviewId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+            return res.status(400).json({ message: 'Invalid review id' });
+        }
+
+        const review = await ItemReview.findById(reviewId);
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+
+        if (review.reviewer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'You can only delete your own review.' });
+        }
+
+        await review.deleteOne();
+        res.json({ message: 'Review deleted.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // @route   GET /api/item-reviews/trust-score/me
 // @desc    Current user's trust score
 router.get('/trust-score/me', protect, async (req, res) => {
