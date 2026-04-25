@@ -15,6 +15,7 @@ const UserProfile = () => {
   const [borrowingHistory, setBorrowingHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [trust, setTrust] = useState(null);
+  const [moneyStats, setMoneyStats] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -27,7 +28,7 @@ const UserProfile = () => {
 
     const load = async () => {
       try {
-        const [profileRes, lendingRes, borrowingRes, trustRes] = await Promise.all([
+        const [profileRes, lendingRes, borrowingRes, trustRes, moneyRes] = await Promise.all([
           axios.get('http://localhost:5000/api/auth/profile', { headers }),
           axios
             .get('http://localhost:5000/api/bookings/lender-bookings', { headers })
@@ -38,11 +39,15 @@ const UserProfile = () => {
           axios
             .get('http://localhost:5000/api/item-reviews/trust-score/me', { headers })
             .catch(() => ({ data: null })),
+          axios
+            .get('http://localhost:5000/api/bookings/savings-earnings', { headers })
+            .catch(() => ({ data: null })),
         ]);
         setProfile(profileRes.data);
         setLendingHistory(Array.isArray(lendingRes.data) ? lendingRes.data : []);
         setBorrowingHistory(Array.isArray(borrowingRes.data) ? borrowingRes.data : []);
         setTrust(trustRes.data || null);
+        setMoneyStats(moneyRes.data || null);
       } catch (err) {
         setError(err.response?.data?.message || 'Could not load profile.');
       } finally {
@@ -229,6 +234,7 @@ const UserProfile = () => {
         {!loading && !error && (
           <>
             {trust && <TrustScoreCard trust={trust} />}
+            {moneyStats && <SavingsEarningsCard stats={moneyStats} />}
             <HistoryTable
               title="🏷️ Lending History"
               subtitle="Items you have lent to other students."
@@ -249,6 +255,193 @@ const UserProfile = () => {
     </>
   );
 };
+
+const formatRs = (n) =>
+  `Rs. ${Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+
+const SavingsEarningsCard = ({ stats }) => {
+  const saved = stats?.savings?.totalSaved || 0;
+  const earned = stats?.earnings?.totalEarned || 0;
+  const totalPaid = stats?.savings?.totalPaid || 0;
+  const totalRetail = stats?.savings?.totalActualValue || 0;
+  const netImpact = saved + earned;
+
+  return (
+    <div
+      className="glass-card fade-up"
+      style={{
+        width: '100%',
+        maxWidth: '900px',
+        padding: '22px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          paddingBottom: '12px',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        <div style={{ textAlign: 'left' }}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: '1.05rem',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          >
+            💰 Savings & Earnings
+          </h2>
+          <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            How much you've saved by renting and earned by lending.
+          </p>
+        </div>
+        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+          <div
+            style={{
+              fontSize: '1.4rem',
+              fontWeight: 800,
+              lineHeight: 1,
+              background: 'linear-gradient(135deg, #34d399, #10b981)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            {formatRs(netImpact)}
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+            Total Net Impact
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '12px',
+        }}
+      >
+        <MoneyTile
+          icon="🎒"
+          label="Saved as Borrower"
+          value={formatRs(saved)}
+          subtext={`Across ${stats?.savings?.completedBookings || 0} completed rental${
+            (stats?.savings?.completedBookings || 0) === 1 ? '' : 's'
+          }`}
+          gradient="linear-gradient(135deg, rgba(59,130,246,0.2), rgba(29,78,216,0.15))"
+          accent="#93c5fd"
+          border="rgba(59,130,246,0.35)"
+        />
+        <MoneyTile
+          icon="🏷️"
+          label="Earned as Lender"
+          value={formatRs(earned)}
+          subtext={`Across ${stats?.earnings?.completedBookings || 0} completed rental${
+            (stats?.earnings?.completedBookings || 0) === 1 ? '' : 's'
+          }`}
+          gradient="linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.15))"
+          accent="#34d399"
+          border="rgba(16,185,129,0.35)"
+        />
+      </div>
+
+      <div
+        style={{
+          padding: '12px 14px',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+        }}
+      >
+        <SummaryRow
+          label="Retail value of items you've borrowed"
+          value={formatRs(totalRetail)}
+          icon="🛒"
+        />
+        <SummaryRow
+          label="Total you actually paid in rentals"
+          value={formatRs(totalPaid)}
+          icon="💳"
+        />
+        <SummaryRow
+          label="↳ Direct savings vs. buying"
+          value={formatRs(saved)}
+          icon="✓"
+          highlight
+        />
+      </div>
+
+      <div
+        style={{
+          fontSize: '0.72rem',
+          color: 'var(--text-muted)',
+          lineHeight: 1.5,
+          textAlign: 'left',
+        }}
+      >
+        <strong style={{ color: 'var(--text-secondary)' }}>How it's calculated:</strong>{' '}
+        Savings = (item retail price − rental cost) per completed rental, capped at zero.
+        Earnings = total rental income from items you lent out, across completed bookings.
+      </div>
+    </div>
+  );
+};
+
+const MoneyTile = ({ icon, label, value, subtext, gradient, accent, border }) => (
+  <div
+    style={{
+      padding: '16px',
+      borderRadius: '14px',
+      background: gradient,
+      border: `1px solid ${border}`,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px',
+      textAlign: 'left',
+    }}
+  >
+    <div style={{ fontSize: '1.4rem', lineHeight: 1 }}>{icon}</div>
+    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 500 }}>{label}</div>
+    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: accent, letterSpacing: '-0.02em' }}>
+      {value}
+    </div>
+    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{subtext}</div>
+  </div>
+);
+
+const SummaryRow = ({ label, value, icon, highlight }) => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: '10px',
+      fontSize: '0.82rem',
+      color: highlight ? '#34d399' : 'var(--text-secondary)',
+      fontWeight: highlight ? 700 : 500,
+    }}
+  >
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+      <span>{icon}</span>
+      {label}
+    </span>
+    <span style={{ fontWeight: 700, color: highlight ? '#34d399' : 'var(--text-primary)' }}>
+      {value}
+    </span>
+  </div>
+);
 
 const StatusPill = ({ status }) => {
   const map = {

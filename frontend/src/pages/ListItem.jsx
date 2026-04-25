@@ -11,6 +11,7 @@ const INITIAL_FORM = {
   category: '',
   description: '',
   pricePerDay: '',
+  actualPrice: '',
   discountPercentage: '',
   quantity: '',
   availabilityStatus: 'Available',
@@ -33,6 +34,7 @@ const ListItem = () => {
     category: editingData.category || '',
     description: editingData.description || '',
     pricePerDay: editingData.pricePerDay?.toString() || '',
+    actualPrice: editingData.actualPrice?.toString() || '',
     discountPercentage: editingData.discountPercentage?.toString() || '',
     quantity: editingData.quantity?.toString() || '',
     availabilityStatus: editingData.availabilityStatus || 'Available',
@@ -68,6 +70,12 @@ const ListItem = () => {
       newErrors.pricePerDay = 'Price per day is required.';
     } else if (isNaN(form.pricePerDay) || Number(form.pricePerDay) <= 0) {
       newErrors.pricePerDay = 'Price per day must be greater than 0.';
+    }
+
+    if (form.actualPrice !== '') {
+      if (isNaN(form.actualPrice) || Number(form.actualPrice) < 0) {
+        newErrors.actualPrice = 'Actual price must be 0 or greater.';
+      }
     }
 
     if (form.discountPercentage !== '') {
@@ -366,6 +374,21 @@ const ListItem = () => {
                     </div>
                     <span className="field-hint">Must be greater than 0</span>
                     {errors.pricePerDay && <span className="field-error">⚠ {errors.pricePerDay}</span>}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="actualPrice">Actual Price (Retail Value)</label>
+                    <div className="input-prefix-wrapper">
+                      <span className="input-prefix">Rs.</span>
+                      <input
+                        id="actualPrice" name="actualPrice" type="number"
+                        min="0" step="0.01"
+                        className={`form-input ${errors.actualPrice ? 'input-error' : ''}`}
+                        placeholder="0.00" value={form.actualPrice} onChange={handleChange}
+                      />
+                    </div>
+                    <span className="field-hint">What it would cost to buy new — used to calculate borrower savings.</span>
+                    {errors.actualPrice && <span className="field-error">⚠ {errors.actualPrice}</span>}
                   </div>
 
                   <div className="form-group">

@@ -6,6 +6,119 @@ import Item from '../models/Item.js';
 
 const router = express.Router();
 
+// @route   GET /api/bookings/savings-earnings
+// @desc    Authenticated user's savings (as borrower) + earnings (as lender)
+// @notes
+//   Per booking, we compute the effective rental cost:
+//     paid = booking.totalCost > 0
+//          ? booking.totalCost
+//          : (booking.totalDays > 0 ? totalDays * item.pricePerDay : item.pricePerDay)
+//   Savings (borrower side) = max(0, item.actualPrice - paid)  per completed booking
+//   Earnings (lender side)  = paid                              per completed booking
+router.get('/savings-earnings', protect, async (req, res) => {
+  try {
+    const uid = new mongoose.Types.ObjectId(req.user._id);
+    const completed = ['completed', 'returned'];
+
+    const projectPaid = {
+      $let: {
+        vars: {
+          base: {
+            $cond: [
+              { $gt: ['$totalCost', 0] },
+              '$totalCost',
+              {
+                $cond: [
+                  { $gt: ['$totalDays', 0] },
+                  { $multiply: ['$totalDays', { $ifNull: ['$itemDoc.pricePerDay', 0] }] },
+                  { $ifNull: ['$itemDoc.pricePerDay', 0] },
+                ],
+              },
+            ],
+          },
+        },
+        in: '$$base',
+      },
+    };
+
+    const [savingsAgg] = await Booking.aggregate([
+      { $match: { borrower: uid, status: { $in: completed } } },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'item',
+          foreignField: '_id',
+          as: 'itemDoc',
+        },
+      },
+      { $unwind: { path: '$itemDoc', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          paid: projectPaid,
+          actualPrice: { $ifNull: ['$itemDoc.actualPrice', 0] },
+        },
+      },
+      {
+        $project: {
+          paid: 1,
+          actualPrice: 1,
+          saved: {
+            $max: [0, { $subtract: ['$actualPrice', '$paid'] }],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalPaid: { $sum: '$paid' },
+          totalActualValue: { $sum: '$actualPrice' },
+          totalSaved: { $sum: '$saved' },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const [earningsAgg] = await Booking.aggregate([
+      { $match: { lender: uid, status: { $in: completed } } },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'item',
+          foreignField: '_id',
+          as: 'itemDoc',
+        },
+      },
+      { $unwind: { path: '$itemDoc', preserveNullAndEmptyArrays: true } },
+      {
+        $project: { earned: projectPaid },
+      },
+      {
+        $group: {
+          _id: null,
+          totalEarned: { $sum: '$earned' },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    res.json({
+      savings: {
+        totalSaved: Math.round(savingsAgg?.totalSaved || 0),
+        totalPaid: Math.round(savingsAgg?.totalPaid || 0),
+        totalActualValue: Math.round(savingsAgg?.totalActualValue || 0),
+        completedBookings: savingsAgg?.count || 0,
+      },
+      earnings: {
+        totalEarned: Math.round(earningsAgg?.totalEarned || 0),
+        completedBookings: earningsAgg?.count || 0,
+      },
+    });
+  } catch (error) {
+    console.error('Error computing savings/earnings:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // @route   GET /api/bookings/summary/:userId
 // @desc    Public rental summary for a user
 router.get('/summary/:userId', async (req, res) => {
