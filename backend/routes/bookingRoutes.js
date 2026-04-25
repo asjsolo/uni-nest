@@ -201,7 +201,7 @@ router.get('/my-requests', protect, async (req, res) => {
   try {
     const bookings = await Booking.find({ borrower: req.user._id })
       .populate('item')
-      .populate('lender', 'fullname email phonenumber')
+      .populate('lender', 'name fullname email phonenumber')
       .sort({ createdAt: -1 });
     
     res.json(bookings);
@@ -217,7 +217,7 @@ router.get('/lender-bookings', protect, async (req, res) => {
   try {
     const bookings = await Booking.find({ lender: req.user._id })
       .populate('item')
-      .populate('borrower', 'fullname email phonenumber campusRegistrationNumber')
+      .populate('borrower', 'name fullname email phonenumber campusRegistrationNumber')
       .sort({ createdAt: -1 });
       
     res.json(bookings);
