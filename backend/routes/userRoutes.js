@@ -122,4 +122,56 @@ router.get('/profile', protect, async (req, res) => {
   }
 });
 
+// @route   PUT /api/auth/profile
+// @desc    Update editable profile fields (name, phone, registration no.)
+router.put('/profile', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const { fullname, phonenumber, campusRegistrationNumber } = req.body;
+
+    if (fullname !== undefined) {
+      if (!fullname.trim()) {
+        return res.status(400).json({ message: 'Full name cannot be empty.' });
+      }
+      user.name = fullname.trim();
+    }
+
+    if (phonenumber !== undefined) {
+      if (phonenumber && !/^\d{10}$/.test(phonenumber)) {
+        return res.status(400).json({ message: 'Phone number must be 10 digits.' });
+      }
+      user.phonenumber = phonenumber;
+    }
+
+    if (campusRegistrationNumber !== undefined) {
+      if (
+        campusRegistrationNumber &&
+        !/^(IT|EN|BM|BT)\d{8}$/i.test(campusRegistrationNumber)
+      ) {
+        return res
+          .status(400)
+          .json({ message: 'Invalid Campus Registration Number format.' });
+      }
+      user.campusRegistrationNumber = campusRegistrationNumber;
+    }
+
+    await user.save();
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phonenumber: user.phonenumber,
+      campusRegistrationNumber: user.campusRegistrationNumber,
+      role: user.role,
+      createdAt: user.createdAt,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 export default router;
